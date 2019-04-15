@@ -15,7 +15,7 @@ workflows:
           requires:
             - orb-tools/lint
       - orb-tools/publish-dev:
-          orb-name: agileware-jp/redmine-plugin-orb
+          orb-name: agileware-jp/redmine-plugin
           orb-path: workspace/packed/orb.yml
           requires:
             - orb-tools/pack
