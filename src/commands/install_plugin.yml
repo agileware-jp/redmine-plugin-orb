@@ -1,0 +1,14 @@
+description: Install Redmine plugin << parameters.redmine_plugin_repository >>
+parameters:
+  redmine_version:
+    description: version of Redmine
+    type: string
+  redmine_plugin_repository:
+    description: repository of Redmine plugin
+    type: string
+steps:
+  - run:
+      name: Install plugin << parameters.redmine_plugin_repository >>
+      working_directory: ~/redmine-<< parameters.redmine_version >>/plugins
+      command: |
+        git clone --depth 1 << parameters.redmine_plugin_repository >>

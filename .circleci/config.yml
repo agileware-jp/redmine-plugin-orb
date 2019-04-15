@@ -4,6 +4,13 @@ orbs:
   orb-tools: circleci/orb-tools@8.5.0
 
 workflows:
-  lint:
+  lint_pack:
     jobs:
       - orb-tools/lint
+      - orb-tools/pack:
+          source-dir: src/
+          destination-orb-path: packed/orb.yml
+          workspace-path: packed/orb.yml
+          artifact-path: packed/orb.yml
+          requires:
+            - orb-tools/lint
