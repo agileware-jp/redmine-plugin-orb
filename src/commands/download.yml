@@ -1,12 +1,16 @@
 description: Download Redmine << parameters.redmine_version >>
 parameters:
+  cache_key_prefix:
+    description: prefix of cache key
+    type: string
+    default: redmine-plugin-commands-download
   redmine_version:
     description: version of Redmine
     type: string
 steps:
   - restore_cache:
       keys:
-        - '{{ .Environment.CACHE_VERSION }}-redmine-download-<< parameters.redmine_version >>'
+        - '<< parameters.cache_key_prefix >>-<< parameters.redmine_version >>'
   - run:
       name: Download Redmine << parameters.redmine_version >>
       working_directory: '~/'
@@ -16,5 +20,5 @@ steps:
           curl https://redmine.org/releases/redmine-<< parameters.redmine_version >>.tar.gz | tar zx
         fi
   - save_cache:
-      key: '{{ .Environment.CACHE_VERSION }}-redmine-download-<< parameters.redmine_version >>'
+      key: '<< parameters.cache_key_prefix >>-<< parameters.redmine_version >>'
       paths: ~/redmine-<< parameters.redmine_version >>
