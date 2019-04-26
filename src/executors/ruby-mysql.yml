@@ -1,0 +1,14 @@
+parameters:
+  ruby_version:
+    description: version of Ruby
+    type: string
+  mysql_version:
+    description: version of MySQL
+    type: string
+    default: '5.5'
+docker:
+  - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
+  - image: circleci/mysql:<< parameters.mysql_version >>
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD: true
+      - MYSQL_ROOT_HOST: '%'

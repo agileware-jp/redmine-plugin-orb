@@ -1,0 +1,18 @@
+description: Generate database.yml for PostgreSQL
+parameters:
+  working_directory:
+    description: Redmine root directory
+    type: string
+steps:
+  - run:
+      name: Generate database.yml
+      working_directory: << parameters.working_directory >>
+      command: |
+        cat \<<'EOF' > config/database.yml
+        test:
+          adapter: postgresql
+          database: postgres
+          host: localhost
+          username: postgres
+          password: postgres
+        EOF

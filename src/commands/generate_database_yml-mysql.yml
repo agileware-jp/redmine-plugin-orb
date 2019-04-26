@@ -1,0 +1,19 @@
+description: Generate database.yml for MySQL
+parameters:
+  working_directory:
+    description: Redmine root directory
+    type: string
+steps:
+  - run:
+      name: Generate database.yml
+      working_directory: << parameters.working_directory >>
+      command: |
+        cat \<<'EOF' > config/database.yml
+        test:
+          adapter: mysql2
+          database: lychee_cost_test
+          host: 127.0.0.1
+          username: root
+          password: ""
+          encoding: utf8
+        EOF
