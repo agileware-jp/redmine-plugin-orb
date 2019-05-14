@@ -1,0 +1,6 @@
+parameters:
+  ruby_version:
+    description: version of Ruby
+    type: string
+docker:
+  - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
