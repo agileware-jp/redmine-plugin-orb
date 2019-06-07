@@ -8,15 +8,10 @@ workflows:
     jobs:
       - orb-tools/lint
       - orb-tools/pack:
-          source-dir: src/
-          destination-orb-path: packed/orb.yml
-          workspace-path: packed/orb.yml
-          artifact-path: packed/orb.yml
           requires:
             - orb-tools/lint
       - orb-tools/publish-dev:
           orb-name: agileware-jp/redmine-plugin
-          orb-path: workspace/packed/orb.yml
           requires:
             - orb-tools/pack
           filters:
@@ -24,7 +19,6 @@ workflows:
               ignore: master
       - orb-tools/increment:
           orb-ref: agileware-jp/redmine-plugin
-          orb-path: packed/orb.yml
           requires:
             - orb-tools/pack
           filters:
