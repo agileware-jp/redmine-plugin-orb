@@ -17,7 +17,7 @@ steps:
       command: |
         set -e
         if [ << parameters.redmine_version >> = trunk ]; then
-          svn co --non-interactive --trust-server-cert https://svn.redmine.org/redmine/trunk ~/redmine-trunk
+          svn co --non-interactive --config-option servers:global:ssl-authority-files=<(curl -sL https://www.gandi.net/static/CAs/GandiStandardSSLCA2.pem) https://svn.redmine.org/redmine/trunk ~/redmine-trunk
           exit
         fi
         if [ ! -d ~/redmine-<< parameters.redmine_version >> ]; then
