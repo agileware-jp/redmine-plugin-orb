@@ -9,6 +9,3 @@ parameters:
 docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
   - image: circleci/mysql:<< parameters.mysql_version >>
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD: true
-      - MYSQL_ROOT_HOST: '%'
