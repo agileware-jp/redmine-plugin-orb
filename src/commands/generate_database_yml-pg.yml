@@ -11,8 +11,8 @@ steps:
         cat \<<'EOF' > config/database.yml
         test:
           adapter: postgresql
-          database: postgres
-          host: localhost
+          database: circle_test
+          host: 127.0.0.1
           username: postgres
           password: postgres
         EOF

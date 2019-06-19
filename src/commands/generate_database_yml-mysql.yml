@@ -11,9 +11,9 @@ steps:
         cat \<<'EOF' > config/database.yml
         test:
           adapter: mysql2
-          database: lychee_cost_test
+          database: circle_test
           host: 127.0.0.1
           username: root
-          password: ""
-          encoding: utf8
+          password:
+          encoding: utf8mb4
         EOF
