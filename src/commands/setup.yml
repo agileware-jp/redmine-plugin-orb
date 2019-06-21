@@ -4,30 +4,24 @@ parameters:
     description: key of cache
     type: string
     default: redmine-plugin-commands-setup
-  working_directory:
-    description: Redmine root directory
-    type: string
 steps:
   - restore_cache:
       keys:
         - '<< parameters.cache_key >>'
   - run:
       name: Setup Redmine
-      working_directory: << parameters.working_directory >>
       command: |
         bundle check || bundle install --without development rmagick
   - save_cache:
       key: '<< parameters.cache_key >>'
       paths:
         - ~/.bundle
-        - << parameters.working_directory >>/Gemfile.lock
+        - Gemfile.lock
   - run:
       name: Setup Database
-      working_directory: << parameters.working_directory >>
       command: |
         bundle exec rake db:create db:migrate
   - run:
       name: Setup plugins
-      working_directory: << parameters.working_directory >>
       command: |
         bundle exec rake redmine:plugins

@@ -13,16 +13,15 @@ steps:
         - '<< parameters.cache_key_prefix >>-<< parameters.redmine_version >>'
   - run:
       name: Download Redmine << parameters.redmine_version >>
-      working_directory: '~/'
       command: |
         set -e
         if [ << parameters.redmine_version >> = trunk ]; then
-          svn co --non-interactive --config-option servers:global:ssl-authority-files=<(curl -sL https://www.gandi.net/static/CAs/GandiStandardSSLCA2.pem) https://svn.redmine.org/redmine/trunk ~/redmine-trunk
+          svn co --non-interactive --config-option servers:global:ssl-authority-files=<(curl -sL https://www.gandi.net/static/CAs/GandiStandardSSLCA2.pem) https://svn.redmine.org/redmine/trunk redmine-trunk
           exit
         fi
-        if [ ! -d ~/redmine-<< parameters.redmine_version >> ]; then
+        if [ ! -d redmine-<< parameters.redmine_version >> ]; then
           curl https://redmine.org/releases/redmine-<< parameters.redmine_version >>.tar.gz | tar zx
         fi
   - save_cache:
       key: '<< parameters.cache_key_prefix >>-<< parameters.redmine_version >>'
-      paths: ~/redmine-<< parameters.redmine_version >>
+      paths: redmine-<< parameters.redmine_version >>
