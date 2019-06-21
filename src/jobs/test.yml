@@ -1,0 +1,40 @@
+parameters:
+  before-setup:
+    description: steps to execute before setup
+    type: steps
+    default: []
+  db:
+    description: name of database
+    type: string
+  executor:
+    description: executor for test
+    type: executor
+  plugin_name:
+    description: name of Redmine plugin
+    type: string
+  redmine_version:
+    description: version of Redmine
+    type: string
+  ruby_version:
+    description: version of Ruby
+    type: string
+  script:
+    description: steps to execute the test
+    type: steps
+
+environment:
+  RAILS_ENV: test
+
+executor: << parameters.executor >>
+
+working_directory: /tmp/workspace/redmine-<< parameters.redmine_version >>
+
+steps:
+  - attach_workspace:
+      at: '/tmp/workspace'
+  - checkout:
+      path: plugins/<< parameters.plugin_name >>
+  - steps: << parameters.before-setup >>
+  - setup:
+      cache_key: redmine-plugin-commands-setup-<< parameters.ruby_version >>-<< parameters.redmine_version >>-<< parameters.db >>
+  - steps: << parameters.script >>
