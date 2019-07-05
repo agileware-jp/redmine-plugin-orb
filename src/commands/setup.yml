@@ -15,7 +15,7 @@ steps:
   - save_cache:
       key: '<< parameters.cache_key_prefix >>-{{ checksum "Gemfile" }}'
       paths:
-        - ~/.bundle
+        - /usr/local/bundle
         - Gemfile.lock
   - run:
       name: Setup Database
