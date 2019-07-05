@@ -42,5 +42,5 @@ steps:
         fi
   - steps: << parameters.before-setup >>
   - setup:
-      cache_key_prefix: << parameters.cache_key_prefix >>-{{ checksum "/tmp/plugin/Gemfile" }}
+      cache_key_prefix: << parameters.cache_key_prefix >>{{ checksum "/tmp/plugin/Gemfile" }}
   - steps: << parameters.script >>
