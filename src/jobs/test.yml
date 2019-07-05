@@ -12,6 +12,7 @@ parameters:
   plugin_name:
     description: name of Redmine plugin
     type: string
+    default: ''
   script:
     description: steps to execute the test
     type: steps
@@ -30,8 +31,16 @@ steps:
   - attach_workspace:
       at: '/tmp/workspace'
   - checkout:
-      path: plugins/<< parameters.plugin_name >>
+      path: /tmp/plugin
+  - run:
+      name: Install plugin
+      command: |
+        if [ -n "<< parameters.plugin_name >>" ]; then
+          ln -s /tmp/plugin plugins/<< parameters.plugin_name >>
+        else
+          ln -s /tmp/plugin plugins/$CIRCLE_PROJECT_REPONAME
+        fi
   - steps: << parameters.before-setup >>
   - setup:
-      cache_key_prefix: << parameters.cache_key_prefix >>-{{ checksum "plugins/<< parameters.plugin_name >>/Gemfile" }}
+      cache_key_prefix: << parameters.cache_key_prefix >>-{{ checksum "/tmp/plugin/Gemfile" }}
   - steps: << parameters.script >>
