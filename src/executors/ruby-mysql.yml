@@ -2,10 +2,11 @@ parameters:
   ruby_version:
     description: version of Ruby
     type: string
+    default: latest
   mysql_version:
     description: version of MySQL
     type: string
-    default: '5.5'
+    default: latest
 docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
   - image: circleci/mysql:<< parameters.mysql_version >>
