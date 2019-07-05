@@ -7,13 +7,13 @@ parameters:
 steps:
   - restore_cache:
       keys:
-        - '<< parameters.cache_key_prefix >>{{ checksum "Gemfile" }}'
+        - '<< parameters.cache_key_prefix >>{{ checksum "Gemfile" }}-{{ checksum "config/database.yml" }}'
   - run:
       name: Setup Redmine
       command: |
         bundle check || bundle install --without development rmagick
   - save_cache:
-      key: '<< parameters.cache_key_prefix >>{{ checksum "Gemfile" }}'
+      key: '<< parameters.cache_key_prefix >>{{ checksum "Gemfile" }}-{{ checksum "config/database.yml" }}'
       paths:
         - /usr/local/bundle
         - Gemfile.lock
