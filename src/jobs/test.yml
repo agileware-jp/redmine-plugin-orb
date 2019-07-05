@@ -27,7 +27,7 @@ environment:
 
 executor: << parameters.executor >>
 
-working_directory: /tmp/workspace/redmine-<< parameters.redmine_version >>
+working_directory: /tmp/workspace/redmine
 
 steps:
   - attach_workspace:

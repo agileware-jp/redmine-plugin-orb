@@ -15,7 +15,11 @@ steps:
   - download:
       cache_key_prefix: << parameters.cache_key_prefix >>
       redmine_version: << parameters.redmine_version >>
+  - run:
+      name: Rename redmine-<< parameters.redmine_version >> -> redmine
+      command: |
+        mv redmine-<< parameters.redmine_version >> redmine
   - persist_to_workspace:
       root: /tmp/workspace
       paths:
-        - redmine-<< parameters.redmine_version >>
+        - redmine
