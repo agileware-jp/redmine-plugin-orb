@@ -19,7 +19,11 @@ parameters:
     type: steps
     default:
       - run:
-          bin/rails redmine:plugins:test NAME=$CIRCLE_PROJECT_REPONAME
+          if [ -n "<< parameters.plugin_name >>" ]; then
+            bin/rails redmine:plugins:test NAME=<< parameters.plugin_name >>
+          else
+            bin/rails redmine:plugins:test NAME=$CIRCLE_PROJECT_REPONAME
+          fi
 
 environment:
   RAILS_ENV: test
