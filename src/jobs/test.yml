@@ -3,20 +3,14 @@ parameters:
     description: steps to execute before setup
     type: steps
     default: []
-  db:
-    description: name of database
+  cache_key_prefix:
+    description: key of cache
     type: string
   executor:
     description: executor for test
     type: executor
   plugin_name:
     description: name of Redmine plugin
-    type: string
-  redmine_version:
-    description: version of Redmine
-    type: string
-  ruby_version:
-    description: version of Ruby
     type: string
   script:
     description: steps to execute the test
@@ -36,5 +30,5 @@ steps:
       path: plugins/<< parameters.plugin_name >>
   - steps: << parameters.before-setup >>
   - setup:
-      cache_key: redmine-plugin-commands-setup-<< parameters.ruby_version >>-<< parameters.redmine_version >>-<< parameters.db >>
+      cache_key: << parameters.cache_key_prefix >>-redmine-plugin-commands-setup
   - steps: << parameters.script >>
