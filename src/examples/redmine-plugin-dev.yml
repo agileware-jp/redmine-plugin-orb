@@ -1,0 +1,17 @@
+usage:
+  version: 2.1
+
+  orbs:
+    redmine: agileware-jp/redmine-plugin@x.y.z
+
+  workflows:
+    version: 2
+    test:
+      jobs:
+        - redmine/download:
+            redmine_version: trunk
+        - redmine/test:
+            before-setup: [redmine/generate_database_yml-pg]
+            cache_key_prefix: '{{ .Environment.CACHE_VERSION }}'
+            executor: redmine/ruby-pg
+            requires: [redmine/download]
