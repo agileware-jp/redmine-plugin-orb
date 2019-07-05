@@ -1,19 +1,19 @@
 description: Setup Redmine
 parameters:
-  cache_key:
-    description: key of cache
+  cache_key_prefix:
+    description: prefix of cache key
     type: string
     default: redmine-plugin-commands-setup
 steps:
   - restore_cache:
       keys:
-        - '<< parameters.cache_key >>'
+        - '<< parameters.cache_key_prefix >>-{{ checksum "Gemfile" }}'
   - run:
       name: Setup Redmine
       command: |
         bundle check || bundle install --without development rmagick
   - save_cache:
-      key: '<< parameters.cache_key >>'
+      key: '<< parameters.cache_key_prefix >>-{{ checksum "Gemfile" }}'
       paths:
         - ~/.bundle
         - Gemfile.lock

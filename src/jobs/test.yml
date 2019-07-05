@@ -30,5 +30,5 @@ steps:
       path: plugins/<< parameters.plugin_name >>
   - steps: << parameters.before-setup >>
   - setup:
-      cache_key: << parameters.cache_key_prefix >>-redmine-plugin-commands-setup
+      cache_key_prefix: << parameters.cache_key_prefix >>
   - steps: << parameters.script >>
