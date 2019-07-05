@@ -7,6 +7,10 @@ parameters:
   redmine_version:
     description: version of Redmine
     type: string
+  destination:
+    description: destination path
+    type: string
+    default: ''
 steps:
   - restore_cache:
       keys:
@@ -25,3 +29,9 @@ steps:
   - save_cache:
       key: '<< parameters.cache_key_prefix >>-<< parameters.redmine_version >>'
       paths: redmine-<< parameters.redmine_version >>
+  - run:
+      name: Move redmine-<< parameters.redmine_version >> to destination
+      command: |
+        if [ -n "<< parameters.destination >>" ]; then
+          mv redmine-<< parameters.redmine_version >> << parameters.destination >>
+        fi
