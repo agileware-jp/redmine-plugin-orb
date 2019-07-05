@@ -15,11 +15,11 @@ steps:
   - run:
       name: Setup Redmine
       command: |
-        bundle check || bundle install --without development rmagick
+        bundle check --path vendor/bundle || bundle install --path vendor/bundle
   - save_cache:
       key: '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "Gemfile" }}-{{ checksum "config/database.yml" }}'
       paths:
-        - /usr/local/bundle
+        - vendor/bundle
         - Gemfile.lock
   - run:
       name: Setup Database
