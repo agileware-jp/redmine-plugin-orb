@@ -6,6 +6,7 @@ parameters:
   cache_key_prefix:
     description: key of cache
     type: string
+    default: ''
   executor:
     description: executor for test
     type: executor
