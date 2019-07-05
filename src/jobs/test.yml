@@ -19,14 +19,15 @@ parameters:
     type: steps
     default:
       - run:
-          if [ -n "<< parameters.plugin_name >>" ]; then
-            bin/rails redmine:plugins:test NAME=<< parameters.plugin_name >>
+          if [ -n "$REDMINE_PLUGIN_NAME" ]; then
+            bin/rails redmine:plugins:test NAME=$REDMINE_PLUGIN_NAME
           else
             bin/rails redmine:plugins:test NAME=$CIRCLE_PROJECT_REPONAME
           fi
 
 environment:
   RAILS_ENV: test
+  REDMINE_PLUGIN_NAME: << parameters.plugin_name >>
 
 executor: << parameters.executor >>
 
@@ -40,8 +41,8 @@ steps:
   - run:
       name: Install plugin
       command: |
-        if [ -n "<< parameters.plugin_name >>" ]; then
-          ln -s /tmp/plugin plugins/<< parameters.plugin_name >>
+        if [ -n "$REDMINE_PLUGIN_NAME" ]; then
+          ln -s /tmp/plugin plugins/$REDMINE_PLUGIN_NAME
         else
           ln -s /tmp/plugin plugins/$CIRCLE_PROJECT_REPONAME
         fi
