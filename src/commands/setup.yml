@@ -1,33 +1,31 @@
 description: Setup Redmine
 parameters:
-  cache_key:
-    description: key of cache
+  cache_key_prefix:
+    description: prefix of cache key
     type: string
-    default: redmine-plugin-commands-setup
-  working_directory:
-    description: Redmine root directory
-    type: string
+    default: redmine-plugin-commands-setup-
 steps:
+  - run:
+      name: Check ruby version
+      command: |
+        ruby -v > /tmp/ruby-version
   - restore_cache:
       keys:
-        - '<< parameters.cache_key >>'
+        - '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "Gemfile" }}-{{ checksum "config/database.yml" }}'
   - run:
       name: Setup Redmine
-      working_directory: << parameters.working_directory >>
       command: |
-        bundle check || bundle install --without development rmagick
+        bundle check --path vendor/bundle || bundle install --path vendor/bundle
   - save_cache:
-      key: '<< parameters.cache_key >>'
+      key: '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "Gemfile" }}-{{ checksum "config/database.yml" }}'
       paths:
-        - ~/.bundle
-        - << parameters.working_directory >>/Gemfile.lock
+        - vendor/bundle
+        - Gemfile.lock
   - run:
       name: Setup Database
-      working_directory: << parameters.working_directory >>
       command: |
         bundle exec rake db:create db:migrate
   - run:
       name: Setup plugins
-      working_directory: << parameters.working_directory >>
       command: |
         bundle exec rake redmine:plugins

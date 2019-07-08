@@ -1,0 +1,22 @@
+parameters:
+  cache_key_prefix:
+    description: prefix of cache key
+    type: string
+    default: redmine-plugin-commands-download-
+  redmine_version:
+    description: version of Redmine
+    type: string
+
+executor: downloader
+
+working_directory: '/tmp/workspace'
+
+steps:
+  - download:
+      cache_key_prefix: << parameters.cache_key_prefix >>
+      redmine_version: << parameters.redmine_version >>
+      destination: redmine
+  - persist_to_workspace:
+      root: /tmp/workspace
+      paths:
+        - redmine

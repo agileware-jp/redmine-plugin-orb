@@ -1,12 +1,8 @@
 parameters:
-  ruby_version:
-    description: version of Ruby
-    type: string
-    default: latest
   pg_version:
     description: version of PostgreSQL
     type: string
     default: latest
 docker:
-  - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
+  - image: circleci/ruby:2.3
   - image: circleci/postgres:<< parameters.pg_version >>

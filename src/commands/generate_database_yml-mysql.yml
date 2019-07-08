@@ -1,12 +1,7 @@
 description: Generate database.yml for MySQL
-parameters:
-  working_directory:
-    description: Redmine root directory
-    type: string
 steps:
   - run:
       name: Generate database.yml
-      working_directory: << parameters.working_directory >>
       command: |
         cat \<<'EOF' > config/database.yml
         test:
