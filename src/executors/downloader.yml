@@ -1,2 +1,2 @@
 docker:
-  - image: circleci/ruby
+  - image: buildpack-deps:stretch-scm
