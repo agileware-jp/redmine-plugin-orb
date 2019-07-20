@@ -19,11 +19,10 @@ parameters:
     type: steps
     default:
       - run: |
-          if [ -n "$REDMINE_PLUGIN_NAME" ]; then
-            bin/rails redmine:plugins:test NAME=$REDMINE_PLUGIN_NAME
-          else
-            bin/rails redmine:plugins:test NAME=$CIRCLE_PROJECT_REPONAME
+          if [ -z "$REDMINE_PLUGIN_NAME" ]; then
+            REDMINE_PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
           fi
+          bundle exec rake redmine:plugins:test NAME=$REDMINE_PLUGIN_NAME
 
 environment:
   RAILS_ENV: test
@@ -41,11 +40,10 @@ steps:
   - run:
       name: Install plugin
       command: |
-        if [ -n "$REDMINE_PLUGIN_NAME" ]; then
-          ln -s /tmp/plugin plugins/$REDMINE_PLUGIN_NAME
-        else
-          ln -s /tmp/plugin plugins/$CIRCLE_PROJECT_REPONAME
+        if [ -z "$REDMINE_PLUGIN_NAME" ]; then
+          REDMINE_PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
         fi
+        ln -s /tmp/plugin plugins/$REDMINE_PLUGIN_NAME
   - steps: << parameters.before-setup >>
   - setup:
       cache_key_prefix: << parameters.cache_key_prefix >>{{ checksum "/tmp/plugin/Gemfile" }}
