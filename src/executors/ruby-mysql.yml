@@ -9,5 +9,5 @@ parameters:
     default: latest
 docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
-  - image: circleci/mysql:<< parameters.mysql_version >>
+  - image: circleci/mysql:<< parameters.mysql_version >>-ram
     command: mysqld --default-authentication-plugin=mysql_native_password

@@ -5,4 +5,4 @@ parameters:
     default: latest
 docker:
   - image: circleci/ruby:2.2
-  - image: circleci/postgres:<< parameters.pg_version >>
+  - image: circleci/postgres:<< parameters.pg_version >>-ram
