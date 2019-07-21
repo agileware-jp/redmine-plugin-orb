@@ -8,21 +8,24 @@ parameters:
     type: string
     default: ''
   executor:
-    description: executor for test
+    description: executor for rspec
     type: executor
   plugin_name:
     description: name of Redmine plugin
     type: string
     default: ''
   script:
-    description: steps to execute the test
+    description: steps to execute the rspec
     type: steps
     default:
       - run: |
           if [ -z "$REDMINE_PLUGIN_NAME" ]; then
             REDMINE_PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
           fi
-          bundle exec rake redmine:plugins:test NAME=$REDMINE_PLUGIN_NAME
+          if [ -f plugins/$REDMINE_PLUGIN_NAME/.circleci/.rspec ]; then
+            cp plugins/$REDMINE_PLUGIN_NAME/.circleci/.rspec .
+          fi
+          bundle exec rspec plugins/$REDMINE_PLUGIN_NAME/spec
 
 environment:
   RAILS_ENV: test
@@ -44,7 +47,6 @@ steps:
           REDMINE_PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
         fi
         ln -s /tmp/plugin plugins/$REDMINE_PLUGIN_NAME
-        touch /tmp/plugin/Gemfile
   - steps: << parameters.before-setup >>
   - setup:
       cache_key_prefix: << parameters.cache_key_prefix >>{{ checksum "/tmp/plugin/Gemfile" }}
