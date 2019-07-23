@@ -1,4 +1,12 @@
 parameters:
+  after-script:
+    description: steps to execute after script
+    type: steps
+    default: []
+  before-script:
+    description: steps to execute before script
+    type: steps
+    default: []
   before-setup:
     description: steps to execute before setup
     type: steps
@@ -50,4 +58,6 @@ steps:
   - steps: << parameters.before-setup >>
   - setup:
       cache_key_prefix: << parameters.cache_key_prefix >>{{ checksum "/tmp/plugin/Gemfile" }}
+  - steps: << parameters.before-script >>
   - steps: << parameters.script >>
+  - steps: << parameters.after-script >>
