@@ -2,7 +2,7 @@ parameters:
   pg_version:
     description: version of PostgreSQL
     type: string
-    default: '9'
+    default: '9-ram'
 docker:
   - image: circleci/ruby:1.9
-  - image: circleci/postgres:<< parameters.pg_version >>-ram
+  - image: circleci/postgres:<< parameters.pg_version >>
