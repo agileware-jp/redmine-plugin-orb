@@ -2,7 +2,7 @@ parameters:
   mysql_version:
     description: version of MySQL
     type: string
-    default: latest-ram
+    default: 5-ram
 docker:
   - image: circleci/ruby:2.2
   - image: circleci/mysql:<< parameters.mysql_version >>
