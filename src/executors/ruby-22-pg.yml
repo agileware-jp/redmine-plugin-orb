@@ -5,4 +5,6 @@ parameters:
     default: '9'
 docker:
   - image: circleci/ruby:2.2
+    environment:
+      DATABASE_ADAPTER: postgresql
   - image: circleci/postgres:<< parameters.pg_version >>-ram

@@ -5,3 +5,5 @@ parameters:
     default: latest
 docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
+    environment:
+      DATABASE_ADAPTER: sqlite3
