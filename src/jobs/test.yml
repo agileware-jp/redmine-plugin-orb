@@ -53,6 +53,7 @@ steps:
         fi
         ln -s /tmp/plugin plugins/$REDMINE_PLUGIN_NAME
         touch /tmp/plugin/Gemfile
+  - generate_database_yml
   - steps: << parameters.before-setup >>
   - setup:
       cache_key_prefix: << parameters.cache_key_prefix >>{{ checksum "/tmp/plugin/Gemfile" }}
