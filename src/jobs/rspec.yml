@@ -55,6 +55,7 @@ steps:
           REDMINE_PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
         fi
         ln -s /tmp/plugin plugins/$REDMINE_PLUGIN_NAME
+  - generate_database_yml
   - steps: << parameters.before-setup >>
   - setup:
       cache_key_prefix: << parameters.cache_key_prefix >>{{ checksum "/tmp/plugin/Gemfile" }}
