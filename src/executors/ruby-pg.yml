@@ -9,4 +9,6 @@ parameters:
     default: latest-ram
 docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
+    environment:
+      DATABASE_ADAPTER: postgresql
   - image: circleci/postgres:<< parameters.pg_version >>
