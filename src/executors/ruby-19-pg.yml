@@ -8,4 +8,3 @@ docker:
     environment:
       DATABASE_ADAPTER: postgresql
   - image: circleci/postgres:<< parameters.pg_version >>
-  
