@@ -2,7 +2,11 @@ parameters:
   after-script:
     description: steps to execute after script
     type: steps
-    default: []
+    default:
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - redmine
   before-script:
     description: steps to execute before script
     type: steps
