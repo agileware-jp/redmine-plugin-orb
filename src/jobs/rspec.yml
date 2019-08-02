@@ -4,9 +4,8 @@ parameters:
     type: steps
     default:
       - persist_to_workspace:
-          root: ~/redmine
-          paths:
-            - redmine
+          root: ~/project
+          paths: ['*']
   before-script:
     description: steps to execute before script
     type: steps
@@ -45,11 +44,9 @@ environment:
 
 executor: << parameters.executor >>
 
-working_directory: /tmp/workspace/redmine
-
 steps:
   - attach_workspace:
-      at: '/tmp/workspace'
+      at: ~/project
   - checkout:
       path: /tmp/plugin
   - run:
