@@ -9,11 +9,13 @@ parameters:
 
 executor: downloader
 
+working_directory: /tmp
+
 steps:
   - download:
       cache_key_prefix: << parameters.cache_key_prefix >>
       redmine_version: << parameters.redmine_version >>
       destination: ~/project
   - persist_to_workspace:
-      root: '.'
+      root: '~/project'
       paths: ['*']
