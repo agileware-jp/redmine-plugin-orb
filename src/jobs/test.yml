@@ -55,12 +55,13 @@ steps:
         if [ -z "$REDMINE_PLUGIN_NAME" ]; then
           REDMINE_PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
         fi
-        ln -s /tmp/plugin plugins/$REDMINE_PLUGIN_NAME
-        touch /tmp/plugin/Gemfile
+        mv /tmp/plugin plugins/$REDMINE_PLUGIN_NAME
+        touch plugins/$REDMINE_PLUGIN_NAME/Gemfile
+        cp plugins/$REDMINE_PLUGIN_NAME/Gemfile /tmp/Gemfile
   - generate_database_yml
   - steps: << parameters.before-setup >>
   - setup:
-      cache_key_prefix: << parameters.cache_key_prefix >>{{ checksum "/tmp/plugin/Gemfile" }}
+      cache_key_prefix: << parameters.cache_key_prefix >>{{ checksum "/tmp/Gemfile" }}
   - steps: << parameters.before-script >>
   - steps: << parameters.script >>
   - steps: << parameters.after-script >>
