@@ -54,6 +54,9 @@ steps:
         fi
         mv /tmp/plugin plugins/$REDMINE_PLUGIN_NAME
         touch plugins/$REDMINE_PLUGIN_NAME/Gemfile
+        if [ -f plugins/$REDMINE_PLUGIN_NAME/Gemfile.local ]; then
+          cat plugins/$REDMINE_PLUGIN_NAME/Gemfile.local >> plugins/$REDMINE_PLUGIN_NAME/Gemfile
+        fi
         cp plugins/$REDMINE_PLUGIN_NAME/Gemfile /tmp/Gemfile
   - generate_database_yml
   - steps: << parameters.before-setup >>
