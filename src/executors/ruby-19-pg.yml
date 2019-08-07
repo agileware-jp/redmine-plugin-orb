@@ -4,7 +4,7 @@ parameters:
     type: string
     default: '9-ram'
 docker:
-  - image: circleci/ruby:1.9
+  - image: circleci/ruby:1.9-node-browsers
     environment:
       DATABASE_ADAPTER: postgresql
   - image: circleci/postgres:<< parameters.pg_version >>

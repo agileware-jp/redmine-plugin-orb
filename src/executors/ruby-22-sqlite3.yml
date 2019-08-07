@@ -1,0 +1,4 @@
+docker:
+  - image: circleci/ruby:2.2-node-browsers
+    environment:
+      DATABASE_ADAPTER: sqlite3
