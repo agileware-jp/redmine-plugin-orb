@@ -4,7 +4,7 @@ parameters:
     type: string
     default: 5-ram
 docker:
-  - image: circleci/ruby:2.4
+  - image: circleci/ruby:2.4-node-browsers
     environment:
       DATABASE_ADAPTER: mysql2
   - image: circleci/mysql:<< parameters.mysql_version >>
