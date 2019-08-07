@@ -1,0 +1,4 @@
+docker:
+  - image: circleci/ruby:1.9
+    environment:
+      DATABASE_ADAPTER: sqlite3
