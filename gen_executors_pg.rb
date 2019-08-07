@@ -7,7 +7,7 @@ parameters:
     type: string
     default: <%= pg_version == :'latest-ram' ? 'latest-ram' : "'" + pg_version.to_s + "'" %>
 docker:
-  - image: circleci/ruby:<%= ruby_version %>
+  - image: circleci/ruby:<%= ruby_version %>-node-browsers
     environment:
       DATABASE_ADAPTER: postgresql
   - image: circleci/postgres:<< parameters.pg_version >>

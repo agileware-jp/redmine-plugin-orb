@@ -7,7 +7,7 @@ parameters:
     type: string
     default: <%= mysql_version %>
 docker:
-  - image: circleci/ruby:<%= ruby_version %>
+  - image: circleci/ruby:<%= ruby_version %>-node-browsers
     environment:
       DATABASE_ADAPTER: mysql2
   - image: circleci/mysql:<< parameters.mysql_version >>
