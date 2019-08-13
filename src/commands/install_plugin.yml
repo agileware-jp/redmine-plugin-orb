@@ -3,9 +3,13 @@ parameters:
   redmine_plugin_repository:
     description: repository of Redmine plugin
     type: string
+  branch:
+    description: branch of Redmine plugin
+    type: string
+    default: master
 steps:
   - run:
       name: Install plugin << parameters.redmine_plugin_repository >>
       working_directory: plugins
       command: |
-        git clone --depth 1 << parameters.redmine_plugin_repository >>
+        git clone --depth 1 --branch << parameters.branch >> << parameters.redmine_plugin_repository >>
