@@ -15,6 +15,23 @@ docker:
   - image: circleci/postgres:<< parameters.pg_version >>
 POSTGRES
 
+File.write('src/executors/ruby-mariadb.yml', <<~MARIADB.freeze)
+parameters:
+  ruby_version:
+    description: version of Ruby
+    type: string
+    default: latest
+  mariadb_version:
+    description: version of MariaDB
+    type: string
+    default: latest-ram
+docker:
+  - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
+    environment:
+      DATABASE_ADAPTER: mysql2
+  - image: circleci/mariadb:<< parameters.mariadb_version >>
+MARIADB
+
 File.write('src/executors/ruby-mysql.yml', <<~MYSQL.freeze)
 parameters:
   ruby_version:
