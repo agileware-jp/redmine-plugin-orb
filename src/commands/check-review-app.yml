@@ -1,0 +1,24 @@
+description: Check review app is created
+
+parameters:
+  persist-review-app-name:
+    description: Persist the name of the review app to a file
+    type: string
+    default: '~/heroku-review-app-name'
+
+steps:
+  - run:
+      name: Check review app is created
+      environment:
+        REVIEW_APP_NAME_PATH: << parameters.persist-review-app-name >>
+      command: |
+        export HEROKU_APP_NAME=$(heroku pipelines:info --json << parameters.heroku-pipeline-name >> | ruby -rjson -e 'puts JSON.parse($stdin.read).fetch("apps").detect { |a| a.dig("coupling", "stage") == "review" && a.fetch("git_url").end_with?("#{ENV.fetch("CIRCLE_PULL_REQUEST")[/\d+$/]}.git") }&.fetch("name")')
+
+        if [ -z "$HEROKU_APP_NAME" ]; then
+          echo "heroku review apps not found."
+          exit 1
+        fi
+
+        if [ -n "$REVIEW_APP_NAME_PATH" ]; then
+          echo $HEROKU_APP_NAME > $REVIEW_APP_NAME_PATH
+        fi

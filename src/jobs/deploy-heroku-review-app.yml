@@ -1,0 +1,67 @@
+parameters:
+  database-adapter:
+    description: adapter name of config/database.yml
+    type: string
+    default: postgresql
+  after-prepare:
+    description: after steps for "Prepare for Heroku deploy"
+    type: steps
+    default: []
+  plugin_name:
+    description: name of Redmine plugin
+    type: string
+    default: ''
+  heroku-pipeline-name:
+    description: name of Heroku pipeline
+    type: string
+environment:
+  REDMINE_PLUGIN_NAME: << parameters.plugin_name >>
+
+steps:
+  - check-pull-request
+  - check-review-app
+  - attach_workspace:
+      at: ~/project
+  - heroku/install
+  - run:
+      name: Prepare for Heroku deploy
+      command: |
+        set -e
+        cat \<<-'EOF' > Procfile
+        web: bin/rails s
+        EOF
+        cat \<<-'EOF' > config/database.yml
+        production:
+          adapter: << parameters.database-adapter >>
+        EOF
+        ruby -e 'puts "ruby #{RUBY_VERSION.inspect}"' >> Gemfile
+        echo "gem 'rails_12factor', group: 'production'" >> Gemfile
+        bundle lock
+  - steps: << parameters.after-prepare >>
+  - run:
+      name: Create Git commit
+      command: |
+        set -e
+        if [ -z "$REDMINE_PLUGIN_NAME" ]; then
+          REDMINE_PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
+        fi
+
+        git config --global user.email $(cd plugins/$REDMINE_PLUGIN_NAME; git log -1 --pretty="format:%ce")
+        git config --global user.name $(cd plugins/$REDMINE_PLUGIN_NAME; git log -1 --pretty="format:%cn")
+        git init
+        git add .
+        git add -f Gemfile.lock
+        git add -f config/database.yml
+        git commit -m 'deploy'
+  - run:
+      name: Deploy to Heroku
+      command: |
+        set -e
+
+        heroku buildpacks:clear --app $HEROKU_APP_NAME
+        git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git HEAD:master
+        heroku ps:scale --app $HEROKU_APP_NAME web=1
+
+        heroku pg:copy --app $HEROKU_APP_NAME --confirm $HEROKU_APP_NAME redmine-review-app-production::DATABASE_URL DATABASE_URL
+        heroku run --app $HEROKU_APP_NAME bin/rails db:migrate
+        heroku run --app $HEROKU_APP_NAME bin/rails redmine:load_default_data

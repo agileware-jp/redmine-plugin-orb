@@ -1,0 +1,10 @@
+description: Check pull request is created
+steps:
+  - run:
+      name: 'Check pull request #'
+      command: |
+        set -e
+        if [ -z "$CIRCLE_PULL_REQUEST" ]; then
+          echo "Not create pull request yet."
+          exit 1
+        fi
