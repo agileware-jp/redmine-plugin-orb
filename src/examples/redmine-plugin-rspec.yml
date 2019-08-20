@@ -9,9 +9,7 @@ usage:
     test:
       jobs:
         - redmine/download:
-            redmine_version: trunk
-        - redmine/test:
-            before-setup: [redmine/generate_database_yml-pg]
-            cache_key_prefix: '{{ .Environment.CACHE_VERSION }}'
+            redmine_version: trunk # or version string e.g. '4.0.4'
+        - redmine/rspec:
             executor: redmine/ruby-pg
             requires: [redmine/download]
