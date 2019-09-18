@@ -34,6 +34,7 @@ steps:
         production:
           adapter: << parameters.database-adapter >>
         EOF
+        Gemfile.review-app
         ruby -e 'puts "ruby #{RUBY_VERSION.inspect}"' >> Gemfile
         echo "gem 'rails_12factor', group: 'production'" >> Gemfile
         bundle lock

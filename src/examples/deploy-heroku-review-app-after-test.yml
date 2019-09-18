@@ -1,0 +1,17 @@
+usage:
+  version: 2.1
+
+  orbs:
+    redmine: agileware-jp/redmine-plugin@x.y.z
+
+  workflows:
+    version: 2
+    test:
+      jobs:
+        - redmine/download:
+            redmine_version: trunk # or version string e.g. '4.0.4'
+        - redmine/test:
+            executor: redmine/ruby-pg
+            requires: [redmine/download]
+        - redmine/deploy-heroku-review-app:
+            requires: [redmine/test]
