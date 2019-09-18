@@ -6,6 +6,10 @@ parameters:
   redmine_version:
     description: version of Redmine
     type: string
+  after-download:
+    description: steps to run after download command.
+    type: steps
+    default: []
 
 executor: downloader
 
@@ -16,6 +20,7 @@ steps:
       cache_key_prefix: << parameters.cache_key_prefix >>
       redmine_version: << parameters.redmine_version >>
       destination: ~/project
+  - steps: << parameters.after-download >>
   - persist_to_workspace:
       root: '~/project'
       paths: ['*']
