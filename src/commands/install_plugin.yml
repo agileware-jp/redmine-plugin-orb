@@ -1,4 +1,5 @@
 description: Install Redmine plugin << parameters.redmine_plugin_repository >>
+
 parameters:
   redmine_plugin_repository:
     description: repository of Redmine plugin
@@ -7,9 +8,20 @@ parameters:
     description: branch of Redmine plugin
     type: string
     default: master
+  checkout-circle-branch:
+    description: "checkout $CIRCLE_BRANCH (default: true)"
+    type: boolean
+    default: true
+
 steps:
   - run:
       name: Install plugin << parameters.redmine_plugin_repository >>
       working_directory: plugins
       command: |
-        git clone --depth 1 --branch << parameters.branch >> << parameters.redmine_plugin_repository >>
+        branch=<< parameters.branch >>
+        <<# parameters.checkout-circle-branch >>
+        if [ -n "$(git ls-remote << parameters.redmine_plugin_repository >> $CIRCLE_BRANCH)" ]; then
+          branch=$CIRCLE_BRANCH
+        fi
+        <</ parameters.checkout-circle-branch >>
+        git clone --depth 1 --branch $branch << parameters.redmine_plugin_repository >>
