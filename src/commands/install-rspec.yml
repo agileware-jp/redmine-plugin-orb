@@ -1,0 +1,4 @@
+description: Install RSpec
+
+steps:
+  - run: bundle exec rails generate rspec:install
