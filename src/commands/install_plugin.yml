@@ -18,10 +18,12 @@ steps:
       name: Install plugin << parameters.redmine_plugin_repository >>
       working_directory: plugins
       command: |
-        branch=<< parameters.branch >>
+        branch="<< parameters.branch >>"
         <<# parameters.checkout-circle-branch >>
-        if [ -n "$(git ls-remote << parameters.redmine_plugin_repository >> $CIRCLE_BRANCH)" ]; then
-          branch=$CIRCLE_BRANCH
+        if [ -z "$branch" ]; then
+          if [ -n "$(git ls-remote << parameters.redmine_plugin_repository >> $CIRCLE_BRANCH)" ]; then
+            branch=$CIRCLE_BRANCH
+          fi
         fi
         <</ parameters.checkout-circle-branch >>
         git clone --depth 1 --branch $branch << parameters.redmine_plugin_repository >>
