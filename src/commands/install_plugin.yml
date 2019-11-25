@@ -22,7 +22,7 @@ steps:
         if [ -z "$branch" ]; then
           branch='master'
           <<# parameters.checkout-circle-branch >>
-          if [ -n "$(git ls-remote << parameters.redmine_plugin_repository >> $CIRCLE_BRANCH)" ]; then
+          if [ -n "$(git ls-remote -h << parameters.redmine_plugin_repository >> $CIRCLE_BRANCH)" ]; then
             branch=$CIRCLE_BRANCH
           fi
           <</ parameters.checkout-circle-branch >>
