@@ -11,6 +11,7 @@ parameters:
 docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
     environment:
+      RAILS_ENV: test
       DATABASE_ADAPTER: postgresql
   - image: circleci/postgres:<< parameters.pg_version >>
 POSTGRES
@@ -28,6 +29,7 @@ parameters:
 docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
     environment:
+      RAILS_ENV: test
       DATABASE_ADAPTER: mysql2
   - image: circleci/mariadb:<< parameters.mariadb_version >>
 MARIADB
@@ -45,6 +47,7 @@ parameters:
 docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
     environment:
+      RAILS_ENV: test
       DATABASE_ADAPTER: mysql2
   - image: circleci/mysql:<< parameters.mysql_version >>
     command: mysqld --default-authentication-plugin=mysql_native_password
@@ -59,5 +62,6 @@ parameters:
 docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
     environment:
+      RAILS_ENV: test
       DATABASE_ADAPTER: sqlite3
 SQLITE3

@@ -4,6 +4,7 @@ VERSION = <<~POSTGRES.freeze
 docker:
   - image: circleci/ruby:<%= ruby_version %>-node-browsers
     environment:
+      RAILS_ENV: test
       DATABASE_ADAPTER: sqlite3
 POSTGRES
 

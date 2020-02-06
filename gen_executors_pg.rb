@@ -9,6 +9,7 @@ parameters:
 docker:
   - image: circleci/ruby:<%= ruby_version %>-node-browsers
     environment:
+      RAILS_ENV: test
       DATABASE_ADAPTER: postgresql
   - image: circleci/postgres:<< parameters.pg_version >>
 POSTGRES
