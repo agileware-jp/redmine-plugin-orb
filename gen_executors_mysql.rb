@@ -9,6 +9,7 @@ parameters:
 docker:
   - image: circleci/ruby:<%= ruby_version %>-node-browsers
     environment:
+      RAILS_ENV: test
       DATABASE_ADAPTER: mysql2
   - image: circleci/mysql:<< parameters.mysql_version >>
     command: mysqld --default-authentication-plugin=mysql_native_password
