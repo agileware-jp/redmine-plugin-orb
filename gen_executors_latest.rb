@@ -14,6 +14,8 @@ docker:
       RAILS_ENV: test
       DATABASE_ADAPTER: postgresql
   - image: circleci/postgres:<< parameters.pg_version >>
+    environment:
+      POSTGRES_PASSWORD: password
 POSTGRES
 
 File.write('src/executors/ruby-mariadb.yml', <<~MARIADB.freeze)

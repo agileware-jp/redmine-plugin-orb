@@ -12,6 +12,8 @@ docker:
       RAILS_ENV: test
       DATABASE_ADAPTER: postgresql
   - image: circleci/postgres:<< parameters.pg_version >>
+    environment:
+      POSTGRES_PASSWORD: password
 POSTGRES
 
 template = ERB.new(VERSION)
