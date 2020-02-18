@@ -25,6 +25,9 @@ parameters:
     description: name of Redmine plugin
     type: string
     default: ''
+  redmine_version:
+    description: version of Redmine
+    type: string
   script:
     description: steps to execute the rspec
     type: steps
@@ -45,9 +48,10 @@ environment:
 executor: << parameters.executor >>
 
 steps:
-  - attach_workspace:
-      at: /tmp/workspace
-  - run: mv --no-target-directory /tmp/workspace/redmine ~/project
+  - download:
+      cache_key_prefix: << parameters.cache_key_prefix >>
+      redmine_version: << parameters.redmine_version >>
+      destination: ~/project
   - install-plugin:
       copy_gemfile_to: /tmp/Gemfile
       plugin_name: << parameters.plugin_name >>
