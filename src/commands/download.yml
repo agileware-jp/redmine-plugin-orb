@@ -33,5 +33,6 @@ steps:
       name: Move redmine-<< parameters.redmine_version >> to destination
       command: |
         if [ -n "<< parameters.destination >>" ]; then
-          mv redmine-<< parameters.redmine_version >> << parameters.destination >>
+          mv redmine-<< parameters.redmine_version >> /tmp/redmine-plugin-orb-download
+          mv --no-target-directory /tmp/redmine-plugin-orb-download << parameters.destination >>
         fi
