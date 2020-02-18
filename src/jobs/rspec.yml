@@ -32,12 +32,11 @@ parameters:
     description: steps to execute the rspec
     type: steps
     default:
+      - copy-rspec-config:
+          plugin_name: << parameters.plugin_name >>
       - run: |
           if [ -z "$REDMINE_PLUGIN_NAME" ]; then
             REDMINE_PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
-          fi
-          if [ -f plugins/$REDMINE_PLUGIN_NAME/.circleci/.rspec ]; then
-            cp plugins/$REDMINE_PLUGIN_NAME/.circleci/.rspec .
           fi
           bundle exec rspec plugins/$REDMINE_PLUGIN_NAME/spec
   workspace_path:

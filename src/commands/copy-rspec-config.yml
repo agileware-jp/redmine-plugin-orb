@@ -1,0 +1,19 @@
+description: Copy .rspec
+
+parameters:
+  plugin_name:
+    description: name of Redmine plugin
+    type: string
+    default: ''
+
+steps:
+  - run:
+      name: Copy .rspec
+      command: |
+        REDMINE_PLUGIN_NAME="<< parameters.plugin_name >>"
+        if [ -z "$REDMINE_PLUGIN_NAME" ]; then
+          REDMINE_PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
+        fi
+        if [ -f plugins/$REDMINE_PLUGIN_NAME/.circleci/.rspec ]; then
+          cp plugins/$REDMINE_PLUGIN_NAME/.circleci/.rspec .
+        fi
