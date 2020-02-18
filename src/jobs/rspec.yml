@@ -46,7 +46,8 @@ executor: << parameters.executor >>
 
 steps:
   - attach_workspace:
-      at: ~/project
+      at: /tmp/workspace
+  - run: mv --no-target-directory /tmp/workspace/redmine ~/project
   - checkout:
       path: /tmp/plugin
   - run:

@@ -21,6 +21,7 @@ steps:
       redmine_version: << parameters.redmine_version >>
       destination: ~/project
   - steps: << parameters.after-download >>
+  - run: mv ~/project ~/redmine
   - persist_to_workspace:
-      root: '~/project'
-      paths: ['*']
+      root: '~'
+      paths: [redmine]
