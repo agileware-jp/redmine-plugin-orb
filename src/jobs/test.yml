@@ -37,14 +37,21 @@ parameters:
             REDMINE_PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
           fi
           bundle exec rake redmine:plugins:test NAME=$REDMINE_PLUGIN_NAME
+  workspace_path:
+    description: path of attached workspace
+    type: string
+    default: /tmp/workspace
 
 environment:
   RAILS_ENV: test
   REDMINE_PLUGIN_NAME: << parameters.plugin_name >>
+  WORKSPACE_PATH: << parameters.workspace_path >>
 
 executor: << parameters.executor >>
 
 steps:
+  - attach_workspace:
+      at: << parameters.workspace_path >>
   - download:
       cache_key_prefix: << parameters.cache_key_prefix >>
       redmine_version: << parameters.redmine_version >>
