@@ -52,7 +52,7 @@ steps:
   - install-plugin:
       copy_gemfile_to: /tmp/Gemfile
       plugin_name: << parameters.plugin_name >>
-  - generate_database_yml
+  - generate-database_yml
   - steps: << parameters.before-setup >>
   - setup:
       cache_key_prefix: << parameters.cache_key_prefix >>{{ checksum "/tmp/Gemfile" }}
