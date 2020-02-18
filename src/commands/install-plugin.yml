@@ -1,0 +1,30 @@
+description: Install the plugin
+
+parameters:
+  plugin_name:
+    description: name of Redmine plugin
+    type: string
+  copy_gemfile_to:
+    description: path to copy Redmine plugin Gemfile
+    type: string
+    default: ''
+
+steps:
+  - checkout:
+      path: /tmp/plugin
+  - run:
+      name: Install the plugin
+      command: |
+        REDMINE_PLUGIN_NAME="<< parameters.plugin_name >>"
+        if [ -z "$REDMINE_PLUGIN_NAME" ]; then
+          REDMINE_PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
+        fi
+        mv /tmp/plugin plugins/$REDMINE_PLUGIN_NAME
+        touch plugins/$REDMINE_PLUGIN_NAME/Gemfile
+        if [ -f plugins/$REDMINE_PLUGIN_NAME/Gemfile.local ]; then
+          cat plugins/$REDMINE_PLUGIN_NAME/Gemfile.local >> plugins/$REDMINE_PLUGIN_NAME/Gemfile
+        fi
+        COPY_GEMFILE_TO="<< parameters.copy_gemfile_to >>"
+        if [ -n "$COPY_GEMFILE_TO" ]; then
+          cp plugins/$REDMINE_PLUGIN_NAME/Gemfile $COPY_GEMFILE_TO
+        fi
