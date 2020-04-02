@@ -50,6 +50,15 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if the this repository has been added to plugins
           command: test -f redmine/plugins/redmine-plugin-orb/src/@orb.yml
+  test-generate-database_yml:
+    executor: redmine-plugin/ruby-mysql
+    steps:
+      - redmine-plugin/download:
+          version: '3.4.8'
+      # - redmine-plugin/generate-database_yml
+      - run:
+          name: Check if the this repository has been added to plugins
+          command: 'egrep "adapter: mysql2" redmine/config/database.yml'
 
 workflows:
   lint-pack-validate-start-tests:
@@ -76,6 +85,7 @@ workflows:
       - test-download
       - test-install-plugin
       - test-install-self
+      - test-generate-database_yml
 
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
