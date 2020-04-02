@@ -1,29 +1,65 @@
 version: 2.1
 
 orbs:
+  redmine-plugin: agileware-jp/redmine-plugin@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.1.0
 
+# Pipeline parameters
+parameters:
+  # These pipeline parameters are required by the "trigger-integration-tests-workflow"
+  # job, by default.
+  run-integration-tests:
+    type: boolean
+    default: false
+  dev-orb-version:
+    type: string
+    default: "dev:alpha"
+
+jobs: # Integration Testing jobs
+  integration-test-1:
+    executor: orb-tools/ubuntu
+    steps:
+      - checkout
+    # - your-orb/your-orb-command
+
 workflows:
-  release:
+  lint-pack-validate-start-tests:
+    unless: << pipeline.parameters.run-integration-tests >>
     jobs:
-      - orb-tools/lint
-      - orb-tools/shellcheck
+      - orb-tools/lint:
+          name: Lint Orb
+      - orb-tools/shellcheck:
+          name: Check shell commands
       - orb-tools/pack:
+          name: Pack Orb
           requires:
-            - orb-tools/lint
-            - orb-tools/shellcheck
+            - Lint Orb
+            - Check shell commands
       - orb-tools/publish-dev:
+          name: Publish dev version
           orb-name: agileware-jp/redmine-plugin
           requires:
-            - orb-tools/pack
-          filters:
-            branches:
-              ignore: master
-      # - orb-tools/increment:
-      #     attach-workspace: true
-      #     orb-ref: agileware-jp/redmine-plugin
+            - Pack Orb
+      - orb-tools/trigger-integration-tests-workflow:
+          name: Start integration tests
+          requires:
+            - Publish dev version
+  test-and-release:
+    when: << pipeline.parameters.run-integration-tests >>
+    jobs:
+      - integration-test-1
+
+      # publish a semver version of the orb. relies on
+      # the commit subject containing the text "[semver:patch|minor|major|skip]"
+      # as that will determine whether a patch, minor or major
+      # version will be published or if publishing should
+      # be skipped.
+      # e.g. [semver:patch] will cause a patch version to be published.
+      # - orb-tools/dev-promote-prod-from-commit-subject:
+      #     orb-name: <orb-namespace>/<orb-name>
+      #     <orb-config-opts>
       #     requires:
-      #       - orb-tools/pack
+      #       - integration-test-1
       #     filters:
       #       branches:
       #         only: master
