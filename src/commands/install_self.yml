@@ -1,0 +1,15 @@
+description: Install the current repository as plugin
+
+parameters:
+  after_install:
+    description: Steps to run after installation.
+    type: steps
+    default: []
+
+steps:
+  - checkout:
+      path: plugin_code/
+  - run:
+      name: Move plugin code
+      command: mv plugin_code redmine/plugins/$CIRCLE_PROJECT_REPONAME
+  - steps: << parameters.after_install >>
