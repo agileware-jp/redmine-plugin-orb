@@ -46,7 +46,7 @@ jobs: # Integration Testing jobs
     steps:
       - redmine-plugin/download:
           version: '3.4.8'
-      # - redmine-plugin/install_self
+      - redmine-plugin/install_self
       - run:
           name: Check if the this repository has been added to plugins
           command: test -f redmine/plugins/redmine-plugin-orb/src/@orb.yml
