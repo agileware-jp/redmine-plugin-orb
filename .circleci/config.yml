@@ -36,7 +36,7 @@ jobs: # Integration Testing jobs
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download:
           version: '3.4.8'
-      - redmine-plugin/install_plugin:
+      - redmine-plugin/install-plugin:
           repository: git@github.com:agileware-jp/redmine_work_days.git
       - run:
           name: Check if the plugin has been installed
@@ -46,7 +46,7 @@ jobs: # Integration Testing jobs
     steps:
       - redmine-plugin/download:
           version: '3.4.8'
-      - redmine-plugin/install_self
+      - redmine-plugin/install-self
       - run:
           name: Check if the this repository has been added to plugins
           command: test -f redmine/plugins/redmine-plugin-orb/src/@orb.yml
