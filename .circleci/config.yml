@@ -28,13 +28,10 @@ workflows:
     jobs:
       - orb-tools/lint:
           name: Lint Orb
-      - orb-tools/shellcheck:
-          name: Check shell commands
       - orb-tools/pack:
           name: Pack Orb
           requires:
             - Lint Orb
-            - Check shell commands
       - orb-tools/publish-dev:
           name: Publish dev version
           orb-name: agileware-jp/redmine-plugin
