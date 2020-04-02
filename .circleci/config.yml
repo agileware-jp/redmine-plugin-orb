@@ -33,6 +33,7 @@ jobs: # Integration Testing jobs
   test-install-plugin:
     executor: orb-tools/ubuntu
     steps:
+      - checkout # To resolve ssh problems with git later
       - redmine-plugin/download:
           version: '3.4.8'
       - redmine-plugin/install_plugin:
