@@ -11,7 +11,7 @@ parameters:
   destination:
     description: Destination path
     type: string
-    default: 'redmine'
+    default: redmine
 
 steps:
   - restore_cache:
