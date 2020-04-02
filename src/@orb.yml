@@ -1,5 +1,8 @@
 version: 2.1
 
 description: |
-  Orbs for the Redmine plugins automated testing.
-  https://github.com/agileware-jp/redmine-plugin-orb
+  Orbs for automated testing of plugins for Redmine (https://www.redmine.org/).
+
+  Created and maintained by Agileware Inc. (https://agileware.jp/)
+display:
+  source_url:  https://github.com/agileware-jp/redmine-plugin-orb
