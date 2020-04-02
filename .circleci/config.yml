@@ -1,15 +1,17 @@
 version: 2.1
 
 orbs:
-  orb-tools: circleci/orb-tools@8.5.0
+  orb-tools: circleci/orb-tools@9.1.0
 
 workflows:
   release:
     jobs:
       - orb-tools/lint
+      - orb-tools/shellcheck
       - orb-tools/pack:
           requires:
             - orb-tools/lint
+            - orb-tools/shellcheck
       - orb-tools/publish-dev:
           orb-name: agileware-jp/redmine-plugin
           requires:
@@ -17,11 +19,11 @@ workflows:
           filters:
             branches:
               ignore: master
-      - orb-tools/increment:
-          attach-workspace: true
-          orb-ref: agileware-jp/redmine-plugin
-          requires:
-            - orb-tools/pack
-          filters:
-            branches:
-              only: master
+      # - orb-tools/increment:
+      #     attach-workspace: true
+      #     orb-ref: agileware-jp/redmine-plugin
+      #     requires:
+      #       - orb-tools/pack
+      #     filters:
+      #       branches:
+      #         only: master
