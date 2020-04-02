@@ -30,6 +30,16 @@ jobs: # Integration Testing jobs
             egrep "MAJOR.+3" redmine/lib/redmine/version.rb
             egrep "MINOR.+4" redmine/lib/redmine/version.rb
             egrep "TINY.+8" redmine/lib/redmine/version.rb
+  test-install-plugin:
+    executor: orb-tools/ubuntu
+    steps:
+      - redmine-plugin/download:
+          version: '3.4.8'
+      # - redmine-plugin/install-plugin:
+      #     repository: git@github.com:agileware-jp/redmine_work_days.git
+      - run:
+          name: Check if the plugin has been installed
+          command: test -f redmine/plugins/redmine_work_days/init.rb
 
 workflows:
   lint-pack-validate-start-tests:
@@ -55,6 +65,8 @@ workflows:
     jobs:
       - test-download:
           name: Check if Redmine was downloaded
+      - test-install-plugin:
+          name: Check if plugin was installed
 
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
