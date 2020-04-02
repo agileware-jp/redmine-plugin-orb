@@ -64,10 +64,8 @@ workflows:
   test-and-release:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
-      - test-download:
-          name: Check if Redmine was downloaded
-      - test-install-plugin:
-          name: Check if plugin was installed
+      - test-download
+      - test-install-plugin
 
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
