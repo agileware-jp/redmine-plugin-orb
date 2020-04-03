@@ -20,7 +20,7 @@ jobs: # Integration Testing jobs
     executor: orb-tools/ubuntu
     steps:
       - redmine-plugin/download:
-          version: '3.4.8'
+          version: '3.4.9'
       - run:
           name: Check if redmine exists
           command: test -f redmine/lib/redmine.rb
@@ -29,13 +29,16 @@ jobs: # Integration Testing jobs
           command: |
             egrep "MAJOR.+3" redmine/lib/redmine/version.rb
             egrep "MINOR.+4" redmine/lib/redmine/version.rb
-            egrep "TINY.+8" redmine/lib/redmine/version.rb
+            egrep "TINY.+9" redmine/lib/redmine/version.rb
+      - run:
+          name: Check if there is a .version file containing the specified version
+          command: test "`cat redmine/.version`" = "3.4.9"
   test-install-plugin:
     executor: orb-tools/ubuntu
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download:
-          version: '3.4.8'
+          version: '3.4.9'
       - redmine-plugin/install-plugin:
           repository: git@github.com:agileware-jp/redmine_work_days.git
       - run:
@@ -45,7 +48,7 @@ jobs: # Integration Testing jobs
     executor: orb-tools/ubuntu
     steps:
       - redmine-plugin/download:
-          version: '3.4.8'
+          version: '3.4.9'
       - redmine-plugin/install-self
       - run:
           name: Check if the repository was added to plugins
@@ -58,7 +61,7 @@ jobs: # Integration Testing jobs
     executor: redmine-plugin/ruby-mysql
     steps:
       - redmine-plugin/download:
-          version: '3.4.8'
+          version: '3.4.9'
       - redmine-plugin/generate-database_yml
       - run:
           name: Check if the correct database.yml was created
@@ -68,7 +71,7 @@ jobs: # Integration Testing jobs
     executor: redmine-plugin/ruby-sqlite3
     steps:
       - redmine-plugin/download:
-          version: '3.4.8'
+          version: '3.4.9'
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
       - run:
