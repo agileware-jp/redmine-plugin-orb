@@ -39,7 +39,7 @@ jobs: # Integration Testing jobs
       - redmine-plugin/install-plugin:
           repository: git@github.com:agileware-jp/redmine_work_days.git
       - run:
-          name: Check if the plugin has been installed
+          name: Check if the plugin was installed
           command: test -f redmine/plugins/redmine_work_days/init.rb
   test-install-self:
     executor: orb-tools/ubuntu
@@ -48,7 +48,7 @@ jobs: # Integration Testing jobs
           version: '3.4.8'
       - redmine-plugin/install-self
       - run:
-          name: Check if the this repository has been added to plugins
+          name: Check if the repository was added to plugins
           command: test -f redmine/plugins/redmine-plugin-orb/src/@orb.yml
   test-generate-database_yml:
     executor: redmine-plugin/ruby-mysql
@@ -57,7 +57,7 @@ jobs: # Integration Testing jobs
           version: '3.4.8'
       - redmine-plugin/generate-database_yml
       - run:
-          name: Check if the this repository has been added to plugins
+          name: Check if the correct database.yml was created
           command: 'egrep "adapter: mysql2" redmine/config/database.yml'
 
 workflows:
