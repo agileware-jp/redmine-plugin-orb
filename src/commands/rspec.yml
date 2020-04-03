@@ -19,6 +19,10 @@ parameters:
     description: Test migration rollback?
     type: boolean
     default: true
+  plugin:
+    description: Plugin name. If unspecified it will be the current repository's plugin.
+    type: string
+    default: ''
 
 steps:
   - run:
@@ -38,7 +42,12 @@ steps:
           command: echo '--format RspecJunitFormatter -o << parameters.test_result_path >>/rspec.xml' >> .rspec
   - run:
       working_directory: '<< parameters.redmine_root >>'
-      command: RAILS_ENV=test bundle exec rspec plugins/$CIRCLE_PROJECT_REPONAME/spec << parameters.options >>
+      command: |
+        PLUGIN_NAME='<< parameters.plugin >>'
+        if [ -z $PLUGIN_NAME ]; then
+          PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
+        fi
+        RAILS_ENV=test bundle exec rspec plugins/$PLUGIN_NAME/spec << parameters.options >>
   - when:
       condition: << parameters.test_result_path  >>
       steps:
@@ -53,4 +62,4 @@ steps:
         - run:
             name: Test migration rollback
             working_directory: '<< parameters.redmine_root >>'
-            command: RAILS_ENV=test bundle exec rake redmine:plugins:migrate NAME=${CIRCLE_PROJECT_REPONAME} VERSION=0
+            command: RAILS_ENV=test bundle exec rake redmine:plugins:migrate NAME=$CIRCLE_PROJECT_REPONAME VERSION=0

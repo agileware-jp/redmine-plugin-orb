@@ -77,14 +77,10 @@ jobs: # Integration Testing jobs
           version: '3.4.10'
       - redmine-plugin/install-plugin:
           repository: git@github.com:agileware-jp/redmine_work_days.git
-      - run:
-          name: Move plugin for test
-          command: |
-            mv redmine/plugins/redmine_work_days redmine/plugins/$CIRCLE_PROJECT_REPONAME
-            cp redmine/plugins/$CIRCLE_PROJECT_REPONAME/Gemfile.local redmine
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
-      - redmine-plugin/rspec
+      # - redmine-plugin/rspec:
+      #     plugin: redmine_work_days
       - run:
           name: Check if the test result file exists
           command: test -f /tmp/rspec/rspec.xml
