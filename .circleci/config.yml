@@ -70,7 +70,7 @@ jobs: # Integration Testing jobs
       - redmine-plugin/download:
           version: '3.4.8'
       - redmine-plugin/generate-database_yml
-      # - redmine-plugin/bundle-install
+      - redmine-plugin/bundle-install
       - run:
           name: Check if Gemfile.lock exists
           command: test -f redmine/Gemfile.lock
