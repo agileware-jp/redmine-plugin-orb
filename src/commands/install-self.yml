@@ -5,10 +5,6 @@ parameters:
     description: Directory where redmine is installed
     type: string
     default: redmine
-  after_install:
-    description: Steps to run after installation.
-    type: steps
-    default: []
 
 steps:
   - checkout:
@@ -16,4 +12,3 @@ steps:
   - run:
       name: Move plugin code
       command: mv plugin_code << parameters.redmine_root >>/plugins/$CIRCLE_PROJECT_REPONAME
-  - steps: << parameters.after_install >>

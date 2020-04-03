@@ -12,14 +12,9 @@ parameters:
     description: Repository branch to check out
     type: string
     default: master
-  after_install:
-    description: Steps to run after installation.
-    type: steps
-    default: []
 
 steps:
   - run:
       name: Install plugin << parameters.repository >>
       working_directory: '<< parameters.redmine_root >>/plugins'
       command: git clone --depth 1 --branch << parameters.branch >> << parameters.repository >>
-  - steps: << parameters.after_install >>
