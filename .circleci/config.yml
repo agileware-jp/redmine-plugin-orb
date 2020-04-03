@@ -74,13 +74,16 @@ jobs: # Integration Testing jobs
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download:
-          version: '3.4.10'
+          version: '3.4.12'
       - redmine-plugin/install-plugin:
-          repository: git@github.com:agileware-jp/redmine_work_days.git
+          repository: git@github.com:agileware-jp/redmine_github.git
+      - run:
+          name: Copy Gemfile.local
+          command: cp redmine/plugins/redmine_github/Gemfile.local redmine/
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
       - redmine-plugin/rspec:
-          plugin: redmine_work_days
+          plugin: redmine_github
       - run:
           name: Check if the test result file exists
           command: test -f /tmp/rspec/rspec.xml

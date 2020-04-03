@@ -39,7 +39,11 @@ steps:
         run:
           name: Prepare .rspec
           working_directory: '<< parameters.redmine_root >>'
-          command: echo '--format RspecJunitFormatter -o << parameters.test_result_path >>/rspec.xml' >> .rspec
+          command: |
+            echo '--format RspecJunitFormatter -o << parameters.test_result_path >>/rspec.xml' >> .rspec
+            if ! egrep 'rspec_junit_formatter' Gemfile.*; then
+              bundle add rspec_junit_formatter
+            fi
   - run:
       working_directory: '<< parameters.redmine_root >>'
       command: |
@@ -47,6 +51,7 @@ steps:
         if [ -z $PLUGIN_NAME ]; then
           PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
         fi
+
         RAILS_ENV=test bundle exec rspec plugins/$PLUGIN_NAME/spec << parameters.options >>
   - when:
       condition: << parameters.test_result_path  >>
