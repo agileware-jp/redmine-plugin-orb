@@ -55,7 +55,7 @@ jobs: # Integration Testing jobs
     steps:
       - redmine-plugin/download:
           version: '3.4.8'
-      # - redmine-plugin/generate-database_yml
+      - redmine-plugin/generate-database_yml
       - run:
           name: Check if the this repository has been added to plugins
           command: 'egrep "adapter: mysql2" redmine/config/database.yml'
