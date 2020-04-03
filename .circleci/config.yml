@@ -50,6 +50,10 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if the repository was added to plugins
           command: test -f redmine/plugins/redmine-plugin-orb/src/@orb.yml
+      - run:
+          name: Check if Gemfile.local was copied
+          command: test -f redmine/Gemfile.local
+
   test-generate-database_yml:
     executor: redmine-plugin/ruby-mysql
     steps:

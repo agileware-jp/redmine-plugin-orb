@@ -5,6 +5,10 @@ parameters:
     description: Directory where redmine is installed
     type: string
     default: redmine
+  copy_gemfile_local:
+    description: Copy Gemfile.local?
+    type: boolean
+    default: true
 
 steps:
   - checkout:
@@ -12,3 +16,13 @@ steps:
   - run:
       name: Move plugin code
       command: mv plugin_code << parameters.redmine_root >>/plugins/$CIRCLE_PROJECT_REPONAME
+  - when:
+      condition: << parameters.copy_gemfile_local >>
+      steps:
+        - run:
+            name: Copy Gemfile.local
+            command: |
+              PLUGIN_DIR=<< parameters.redmine_root >>/plugins/$CIRCLE_PROJECT_REPONAME
+              if [ -f $PLUGIN_DIR/Gemfile.local ]; then
+                cp $PLUGIN_DIR/Gemfile.local << parameters.redmine_root >>
+              fi
