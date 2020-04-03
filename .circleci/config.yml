@@ -16,11 +16,16 @@ parameters:
     default: "dev:alpha"
 
 jobs: # Integration Testing jobs
-  integration-test-1:
+  test-redmine-download:
     executor: orb-tools/ubuntu
     steps:
-      - checkout
-    # - your-orb/your-orb-command
+      # - redmine-plugin/download:
+      #     version: '3.4.8'
+      - run: |
+          test -f redmine/lib/redmine.rb
+          egrep "MAJOR.+3" redmine/lib/redmine/version.rb
+          egrep "MINOR.+4" redmine/lib/redmine/version.rb
+          egrep "TINY.+8" redmine/lib/redmine/version.rb
 
 workflows:
   lint-pack-validate-start-tests:
@@ -44,7 +49,8 @@ workflows:
   test-and-release:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
-      - integration-test-1
+      - test-redmine-download:
+          name: Check if Redmine was downloaded
 
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
