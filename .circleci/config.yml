@@ -82,7 +82,7 @@ jobs: # Integration Testing jobs
           command: mv redmine/plugins/redmine_work_days redmine/plugins/$CIRCLE_PROJECT_REPONAME
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
-      # - redmine-plugin/rspec
+      - redmine-plugin/rspec
       - run:
           name: Check if the test result file exists
           command: test -f /tmp/rspec/rspec.xml
