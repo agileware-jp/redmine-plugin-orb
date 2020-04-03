@@ -19,10 +19,9 @@ steps:
       keys:
         - '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
   - run:
-      name: Setup Redmine
+      name: Execute bundle install
       working_directory: '<< parameters.redmine_root >>'
-      command: |
-        bundle check --path vendor/bundle || bundle install --path vendor/bundle
+      command: bundle check --path vendor/bundle || bundle install --path vendor/bundle
   - save_cache:
       key: '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
       paths:
