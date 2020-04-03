@@ -79,8 +79,8 @@ jobs: # Integration Testing jobs
           repository: git@github.com:agileware-jp/redmine_work_days.git
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
-      # - redmine-plugin/rspec:
-      #     plugin: redmine_work_days
+      - redmine-plugin/rspec:
+          plugin: redmine_work_days
       - run:
           name: Check if the test result file exists
           command: test -f /tmp/rspec/rspec.xml
