@@ -28,7 +28,7 @@ steps:
   - run:
       name: Initialize RSpec
       working_directory: '<< parameters.redmine_root >>'
-      command: bundle exec rails generate rspec:install
+      command: RAILS_ENV=test bundle exec rails generate rspec:install
   - when:
       condition: << parameters.test_result_path  >>
       steps:
@@ -38,7 +38,7 @@ steps:
           command: echo '--format RspecJunitFormatter -o << parameters.test_result_path >>/rspec.xml' >> .rspec
   - run:
       working_directory: '<< parameters.redmine_root >>'
-      command: bundle exec rspec << parameters.redmine_root >>/plugins/$CIRCLE_PROJECT_REPONAME/spec << parameters.options >>
+      command: RAILS_ENV=test bundle exec rspec << parameters.redmine_root >>/plugins/$CIRCLE_PROJECT_REPONAME/spec << parameters.options >>
   - when:
       condition: << parameters.test_result_path  >>
       steps:
@@ -53,4 +53,4 @@ steps:
         - run:
             name: Test migration rollback
             working_directory: '<< parameters.redmine_root >>'
-            command: bundle exec rake redmine:plugins:migrate NAME=${CIRCLE_PROJECT_REPONAME} VERSION=0
+            command: RAILS_ENV=test bundle exec rake redmine:plugins:migrate NAME=${CIRCLE_PROJECT_REPONAME} VERSION=0
