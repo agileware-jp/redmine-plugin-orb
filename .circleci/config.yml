@@ -64,6 +64,20 @@ jobs: # Integration Testing jobs
           name: Check if the correct database.yml was created
           command: 'egrep "adapter: mysql2" redmine/config/database.yml'
 
+  test-bundle-install:
+    executor: redmine-plugin/ruby-sqlite3
+    steps:
+      - redmine-plugin/download:
+          version: '3.4.8'
+      - redmine-plugin/generate-database_yml
+      # - redmine-plugin/bundle-install
+      - run:
+          name: Check if Gemfile.lock exists
+          command: test -f redmine/Gemfile.lock
+      - run:
+          name: Check if gems were installed into vendor/bundle
+          command: test -d redmine/vendor/bundle
+
 workflows:
   lint-pack-validate-start-tests:
     unless: << pipeline.parameters.run-integration-tests >>
@@ -90,6 +104,7 @@ workflows:
       - test-install-plugin
       - test-install-self
       - test-generate-database_yml
+      - test-bundle-install
 
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"

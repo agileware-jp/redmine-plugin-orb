@@ -1,0 +1,30 @@
+description: Install Redmine's gems
+
+parameters:
+  cache_key_prefix:
+    description: Prefix of cache key
+    type: string
+    default: redmine-plugin-commands-setup-
+  redmine_root:
+    description: Directory where redmine is installed
+    type: string
+    default: redmine
+
+steps:
+  - run:
+      name: Check ruby version
+      command: |
+        ruby -v > /tmp/ruby-version
+  - restore_cache:
+      keys:
+        - '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
+  - run:
+      name: Setup Redmine
+      working_directory: '<< parameters.redmine_root >>'
+      command: |
+        bundle check --path vendor/bundle || bundle install --path vendor/bundle
+  - save_cache:
+      key: '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
+      paths:
+        - vendor/bundle
+        - Gemfile.lock
