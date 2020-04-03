@@ -25,5 +25,5 @@ steps:
   - save_cache:
       key: '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
       paths:
-        - vendor/bundle
-        - Gemfile.lock
+        - << parameters.redmine_root >>/vendor/bundle
+        - << parameters.redmine_root >>/Gemfile.lock

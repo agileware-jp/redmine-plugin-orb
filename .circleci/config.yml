@@ -74,12 +74,14 @@ jobs: # Integration Testing jobs
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download:
-          version: '3.4.9'
+          version: '3.4.10'
       - redmine-plugin/install-plugin:
           repository: git@github.com:agileware-jp/redmine_work_days.git
       - run:
           name: Move plugin for test
-          command: mv redmine/plugins/redmine_work_days redmine/plugins/$CIRCLE_PROJECT_REPONAME
+          command: |
+            mv redmine/plugins/redmine_work_days redmine/plugins/$CIRCLE_PROJECT_REPONAME
+            cp redmine/plugins/$CIRCLE_PROJECT_REPONAME/Gemfile.local redmine
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
       - redmine-plugin/rspec
