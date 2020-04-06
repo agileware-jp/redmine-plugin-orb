@@ -1,0 +1,44 @@
+usage:
+  version: 2.1
+
+  orbs:
+    redmine: agileware-jp/redmine-plugin@x.y.z
+
+  jobs:
+    run-tests:
+      parameters:
+        redmine_version:
+          type: string
+        ruby_version:
+          type: string
+        database:
+          type: enum
+          enum: ['mysql', 'pg', 'mariadb', 'sqlite']
+      executor:
+        name: redmine-plugin/ruby-<< parameters.database >>
+        ruby_version: << parameters.ruby_version >>
+      steps:
+        - checkout
+        - redmine/download:
+            version: << parameters.redmine_version >>
+        - redmine/install-self
+        # Add dependent plugins here
+        # - redmine-plugin/install-plugin:
+        #     repository: git@github.com:my-company/super_plugin.git
+        - redmine-plugin/generate-database_yml
+        - redmine-plugin/bundle-install
+        - redmine-plugin/rspec
+
+  workflows:
+    version: 2
+    test:
+      jobs:
+        - run-tests:
+            redmine_version: '4.1.0'
+            ruby_version: '2.6'
+            database: 'pg'
+        - run-tests:
+            redmine_version: '4.1.0'
+            ruby_version: '2.6'
+            database: 'mysql'
+        # Add more configurations as you like
