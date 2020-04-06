@@ -17,13 +17,13 @@ steps:
         ruby -v > /tmp/ruby-version
   - restore_cache:
       keys:
-        - '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
+        - '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile.local" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
   - run:
       name: Execute bundle install
       working_directory: '<< parameters.redmine_root >>'
       command: bundle check --path vendor/bundle || bundle install --path vendor/bundle
   - save_cache:
-      key: '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
+      key: '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile.local" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
       paths:
         - << parameters.redmine_root >>/vendor/bundle
         - << parameters.redmine_root >>/Gemfile.lock
