@@ -70,7 +70,7 @@ jobs: # Integration Testing jobs
   test-bundle-install-and-rspec:
     executor:
       name: redmine-plugin/ruby-sqlite3
-      ruby_version: '2.3'
+      ruby_version: '2.4'
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download:
