@@ -142,6 +142,7 @@ workflows:
       # be skipped.
       # e.g. [semver:patch] will cause a patch version to be published.
       - orb-tools/dev-promote-prod-from-commit-subject:
+          add-pr-comment: true
           fail-if-semver-not-indicated: true
           orb-name: agileware-jp/redmine-plugin
           publish-version-tag: false
