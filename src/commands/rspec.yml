@@ -42,7 +42,6 @@ steps:
           command: |
             echo '--format RspecJunitFormatter' >> .rspec
             echo '-o << parameters.test_result_path >>/rspec.xml' >> .rspec
-            cat .rspec
             if ! egrep 'rspec_junit_formatter' Gemfile.*; then
               bundle add rspec_junit_formatter
             fi
