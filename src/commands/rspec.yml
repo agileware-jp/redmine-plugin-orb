@@ -47,6 +47,7 @@ steps:
               bundle add rspec_junit_formatter
             fi
   - run:
+      name: Set tested plugin
       working_directory: '<< parameters.redmine_root >>'
       command: |
         PLUGIN_NAME='<< parameters.plugin >>'
@@ -54,9 +55,13 @@ steps:
           PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
         fi
 
+        echo $PLUGIN_NAME >> .tested_plugin
+  - run:
+      working_directory: '<< parameters.redmine_root >>'
+      command: |
         echo '<< parameters.options >>' >> .rspec
 
-        RAILS_ENV=test bundle exec rspec plugins/$PLUGIN_NAME/spec
+        RAILS_ENV=test bundle exec rspec plugins/`cat .tested_plugin`/spec
   - when:
       condition: << parameters.test_result_path  >>
       steps:
@@ -71,4 +76,4 @@ steps:
         - run:
             name: Test migration rollback
             working_directory: '<< parameters.redmine_root >>'
-            command: RAILS_ENV=test bundle exec rake redmine:plugins:migrate NAME=$CIRCLE_PROJECT_REPONAME VERSION=0
+            command: RAILS_ENV=test bundle exec rake redmine:plugins:migrate NAME=`cat .tested_plugin` VERSION=0
