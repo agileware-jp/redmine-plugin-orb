@@ -54,7 +54,9 @@ steps:
           PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
         fi
 
-        RAILS_ENV=test bundle exec rspec plugins/$PLUGIN_NAME/spec << parameters.options >>
+        echo '<< parameters.options >>' >> .rspec
+
+        RAILS_ENV=test bundle exec rspec plugins/$PLUGIN_NAME/spec
   - when:
       condition: << parameters.test_result_path  >>
       steps:
