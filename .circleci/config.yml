@@ -87,6 +87,23 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if the test result file exists
           command: test -f /tmp/rspec/rspec.xml
+  test-bundle-install-and-test:
+    executor:
+      name: redmine-plugin/ruby-sqlite3
+      ruby_version: '2.4'
+    steps:
+      - checkout # To resolve ssh problems with git later
+      - redmine-plugin/download:
+          version: '3.4.12'
+      - redmine-plugin/install-plugin:
+          repository: https://github.com/Loriowar/redmine_issues_tree.git
+      - run:
+          name: Create Gemfile.local
+          command: touch redmine/Gemfile.local
+      - redmine-plugin/generate-database_yml
+      - redmine-plugin/bundle-install
+      - redmine-plugin/test:
+          plugin: redmine_issues_tree
 
 
 workflows:
@@ -116,6 +133,7 @@ workflows:
       - test-install-self
       - test-generate-database_yml
       - test-bundle-install-and-rspec
+      - test-bundle-install-and-test
 
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"

@@ -20,6 +20,7 @@ steps:
       working_directory: '<< parameters.redmine_root >>'
       command: RAILS_ENV=test bundle exec rake db:create db:migrate redmine:plugins
   - run:
+      name: Set tested plugin
       working_directory: '<< parameters.redmine_root >>'
       command: |
         PLUGIN_NAME='<< parameters.plugin >>'
@@ -27,11 +28,14 @@ steps:
           PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
         fi
 
-        RAILS_ENV=test bundle exec rake redmine:plugins:test NAME=$PLUGIN_NAME
+        echo $PLUGIN_NAME >> .tested_plugin
+  - run:
+      working_directory: '<< parameters.redmine_root >>'
+      command: RAILS_ENV=test bundle exec rake redmine:plugins:test NAME=`cat .tested_plugin`
   - when:
       condition: << parameters.test_migration_rollback  >>
       steps:
         - run:
             name: Test migration rollback
             working_directory: '<< parameters.redmine_root >>'
-            command: RAILS_ENV=test bundle exec rake redmine:plugins:migrate NAME=$CIRCLE_PROJECT_REPONAME VERSION=0
+            command: RAILS_ENV=test bundle exec rake redmine:plugins:migrate NAME=`cat .tested_plugin` VERSION=0
