@@ -19,7 +19,7 @@ jobs: # Integration Testing jobs
   test-download:
     executor: orb-tools/ubuntu
     steps:
-      - redmine-plugin/download:
+      - redmine-plugin/download-redmine:
           version: '3.4.9'
       - run:
           name: Check if redmine exists
@@ -48,7 +48,7 @@ jobs: # Integration Testing jobs
     executor: orb-tools/ubuntu
     steps:
       - checkout # To resolve ssh problems with git later
-      - redmine-plugin/download:
+      - redmine-plugin/download-redmine:
           version: '3.4.9'
       - redmine-plugin/install-plugin:
           repository: git@github.com:agileware-jp/redmine_work_days.git
@@ -58,7 +58,7 @@ jobs: # Integration Testing jobs
   test-install-self:
     executor: orb-tools/ubuntu
     steps:
-      - redmine-plugin/download:
+      - redmine-plugin/download-redmine:
           version: '3.4.9'
       - redmine-plugin/install-self
       - run:
@@ -71,7 +71,7 @@ jobs: # Integration Testing jobs
   test-generate-database_yml:
     executor: redmine-plugin/ruby-mysql
     steps:
-      - redmine-plugin/download:
+      - redmine-plugin/download-redmine:
           version: '3.4.9'
       - redmine-plugin/generate-database_yml
       - run:
@@ -84,7 +84,7 @@ jobs: # Integration Testing jobs
       ruby_version: '2.4'
     steps:
       - checkout # To resolve ssh problems with git later
-      - redmine-plugin/download:
+      - redmine-plugin/download-redmine:
           version: '3.4.12'
       - redmine-plugin/install-plugin:
           repository: git@github.com:agileware-jp/redmine_github.git
@@ -104,7 +104,7 @@ jobs: # Integration Testing jobs
       ruby_version: '2.4'
     steps:
       - checkout # To resolve ssh problems with git later
-      - redmine-plugin/download:
+      - redmine-plugin/download-redmine:
           version: '3.4.12'
       - redmine-plugin/install-plugin:
           repository: https://github.com/Loriowar/redmine_issues_tree.git
