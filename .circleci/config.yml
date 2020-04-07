@@ -33,6 +33,16 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if there is a .version file containing the specified version
           command: test "`cat redmine/.version`" = "3.4.9"
+  test-download-redmine-trunk:
+    executor: orb-tools/ubuntu
+    steps:
+      - redmine-plugin/download-redmine-trunk
+      - run:
+          name: Check if redmine exists
+          command: test -f redmine/lib/redmine.rb
+      - run:
+          name: Check if there is a .version file containing "trunk"
+          command: test "`cat redmine/.version`" = "trunk"
   test-install-plugin:
     executor: orb-tools/ubuntu
     steps:
@@ -129,6 +139,7 @@ workflows:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
       - test-download
+      - test-download-redmine-trunk
       - test-install-plugin
       - test-install-self
       - test-generate-database_yml
@@ -148,6 +159,7 @@ workflows:
           publish-version-tag: false
           requires:
             - test-download
+            - test-download-redmine-trunk
             - test-install-plugin
             - test-install-self
             - test-generate-database_yml
