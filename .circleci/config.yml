@@ -16,7 +16,7 @@ parameters:
     default: "dev:alpha"
 
 jobs: # Integration Testing jobs
-  test-download:
+  test-download-redmine:
     executor: orb-tools/ubuntu
     steps:
       - redmine-plugin/download-redmine:
@@ -139,7 +139,7 @@ workflows:
   test-and-release:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
-      - test-download
+      - test-download-redmine
       - test-download-redmine-trunk
       - test-install-plugin
       - test-install-self
@@ -159,7 +159,7 @@ workflows:
           orb-name: agileware-jp/redmine-plugin
           publish-version-tag: false
           requires:
-            - test-download
+            - test-download-redmine
             - test-download-redmine-trunk
             - test-install-plugin
             - test-install-self
