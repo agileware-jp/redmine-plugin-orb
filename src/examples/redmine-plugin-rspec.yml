@@ -19,7 +19,7 @@ usage:
         ruby_version: << parameters.ruby_version >>
       steps:
         - checkout
-        - redmine/download:
+        - redmine/download-redmine:
             version: << parameters.redmine_version >>
         - redmine/install-self
         # Add dependent plugins here

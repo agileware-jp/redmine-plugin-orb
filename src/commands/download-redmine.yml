@@ -20,11 +20,6 @@ steps:
   - run:
       name: Download Redmine << parameters.version >>
       command: |
-        set -e
-        if [ << parameters.version >> = trunk ]; then
-          svn co --non-interactive --config-option servers:global:ssl-authority-files=<(curl -sL https://www.gandi.net/static/CAs/GandiStandardSSLCA2.pem) https://svn.redmine.org/redmine/trunk redmine-trunk
-          exit
-        fi
         if [ ! -d redmine-<< parameters.version >> ]; then
           curl https://redmine.org/releases/redmine-<< parameters.version >>.tar.gz | tar zx
           echo '<< parameters.version >>' > redmine-<< parameters.version >>/.version
