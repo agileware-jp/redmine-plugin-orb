@@ -34,7 +34,8 @@ jobs: # Integration Testing jobs
           name: Check if there is a .version file containing the specified version
           command: test "`cat redmine/.version`" = "3.4.9"
   test-download-redmine-trunk:
-    executor: orb-tools/ubuntu
+    docker:
+      - image: circleci/buildpack-deps:stretch-scm
     steps:
       - redmine-plugin/download-redmine-trunk
       - run:
