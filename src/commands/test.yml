@@ -1,0 +1,41 @@
+description: Run Test::Unit
+
+parameters:
+  redmine_root:
+    description: Directory where redmine is installed
+    type: string
+    default: redmine
+  test_migration_rollback:
+    description: Test migration rollback?
+    type: boolean
+    default: true
+  plugin:
+    description: Plugin name. If unspecified it will be the current repository's plugin.
+    type: string
+    default: ''
+
+steps:
+  - run:
+      name: Setup Database
+      working_directory: '<< parameters.redmine_root >>'
+      command: RAILS_ENV=test bundle exec rake db:create db:migrate redmine:plugins
+  - run:
+      name: Set tested plugin
+      working_directory: '<< parameters.redmine_root >>'
+      command: |
+        PLUGIN_NAME='<< parameters.plugin >>'
+        if [ -z $PLUGIN_NAME ]; then
+          PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
+        fi
+
+        echo $PLUGIN_NAME >> .tested_plugin
+  - run:
+      working_directory: '<< parameters.redmine_root >>'
+      command: RAILS_ENV=test bundle exec rake redmine:plugins:test NAME=`cat .tested_plugin`
+  - when:
+      condition: << parameters.test_migration_rollback  >>
+      steps:
+        - run:
+            name: Test migration rollback
+            working_directory: '<< parameters.redmine_root >>'
+            command: RAILS_ENV=test bundle exec rake redmine:plugins:migrate NAME=`cat .tested_plugin` VERSION=0

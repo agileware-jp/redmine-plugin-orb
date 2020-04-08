@@ -1,0 +1,33 @@
+description: Download Redmine trunk
+
+parameters:
+  cache_key_prefix:
+    description: Prefix of cache key
+    type: string
+    default: redmine-plugin-commands-download-
+  destination:
+    description: Destination path
+    type: string
+    default: redmine
+
+steps:
+  - run:
+      name: Get latest trunk info
+      command: svn info https://svn.redmine.org/redmine/trunk > .redmine-trunk
+  - restore_cache:
+      keys:
+        - '<< parameters.cache_key_prefix >>{{ checksum ".redmine-trunk" }}'
+  - run:
+      name: Download Redmine trunk
+      command: |
+        if [ ! -d redmine-trunk ]; then
+          svn co --non-interactive --config-option servers:global:ssl-authority-files=<(curl -sL https://www.gandi.net/static/CAs/GandiStandardSSLCA2.pem) https://svn.redmine.org/redmine/trunk redmine-trunk
+          echo 'trunk' > redmine-trunk/.version
+        fi
+  - save_cache:
+      key: '<< parameters.cache_key_prefix >>{{ checksum ".redmine-trunk" }}'
+      paths:
+        - redmine-trunk
+  - run:
+      name: Move Redmine to << parameters.destination >>
+      command: mv redmine-trunk << parameters.destination >>

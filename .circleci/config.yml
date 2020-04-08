@@ -1,27 +1,171 @@
 version: 2.1
 
 orbs:
-  orb-tools: circleci/orb-tools@8.5.0
+  redmine-plugin: agileware-jp/redmine-plugin@<<pipeline.parameters.dev-orb-version>>
+  orb-tools: circleci/orb-tools@9.1.0
+
+# Pipeline parameters
+parameters:
+  # These pipeline parameters are required by the "trigger-integration-tests-workflow"
+  # job, by default.
+  run-integration-tests:
+    type: boolean
+    default: false
+  dev-orb-version:
+    type: string
+    default: "dev:alpha"
+
+jobs: # Integration Testing jobs
+  test-download-redmine:
+    executor: orb-tools/ubuntu
+    steps:
+      - redmine-plugin/download-redmine:
+          version: '3.4.9'
+      - run:
+          name: Check if redmine exists
+          command: test -f redmine/lib/redmine.rb
+      - run:
+          name: Check if redmine has the downloaded version
+          command: |
+            egrep "MAJOR.+3" redmine/lib/redmine/version.rb
+            egrep "MINOR.+4" redmine/lib/redmine/version.rb
+            egrep "TINY.+9" redmine/lib/redmine/version.rb
+      - run:
+          name: Check if there is a .version file containing the specified version
+          command: test "`cat redmine/.version`" = "3.4.9"
+  test-download-redmine-trunk:
+    docker:
+      - image: circleci/buildpack-deps:stretch-scm
+    steps:
+      - redmine-plugin/download-redmine-trunk
+      - run:
+          name: Check if redmine exists
+          command: test -f redmine/lib/redmine.rb
+      - run:
+          name: Check if there is a .version file containing "trunk"
+          command: test "`cat redmine/.version`" = "trunk"
+  test-install-plugin:
+    executor: orb-tools/ubuntu
+    steps:
+      - checkout # To resolve ssh problems with git later
+      - redmine-plugin/download-redmine:
+          version: '3.4.9'
+      - redmine-plugin/install-plugin:
+          repository: git@github.com:agileware-jp/redmine_work_days.git
+      - run:
+          name: Check if the plugin was installed
+          command: test -f redmine/plugins/redmine_work_days/init.rb
+  test-install-self:
+    executor: orb-tools/ubuntu
+    steps:
+      - redmine-plugin/download-redmine:
+          version: '3.4.9'
+      - redmine-plugin/install-self
+      - run:
+          name: Check if the repository was added to plugins
+          command: test -f redmine/plugins/redmine-plugin-orb/src/@orb.yml
+      - run:
+          name: Check if Gemfile.local was copied
+          command: test -f redmine/Gemfile.local
+
+  test-generate-database_yml:
+    executor: redmine-plugin/ruby-mysql
+    steps:
+      - redmine-plugin/download-redmine:
+          version: '3.4.9'
+      - redmine-plugin/generate-database_yml
+      - run:
+          name: Check if the correct database.yml was created
+          command: 'egrep "adapter: mysql2" redmine/config/database.yml'
+
+  test-bundle-install-and-rspec:
+    executor:
+      name: redmine-plugin/ruby-sqlite3
+      ruby_version: '2.4'
+    steps:
+      - checkout # To resolve ssh problems with git later
+      - redmine-plugin/download-redmine:
+          version: '3.4.12'
+      - redmine-plugin/install-plugin:
+          repository: git@github.com:agileware-jp/redmine_github.git
+      - run:
+          name: Copy Gemfile.local
+          command: cp redmine/plugins/redmine_github/Gemfile.local redmine/
+      - redmine-plugin/generate-database_yml
+      - redmine-plugin/bundle-install
+      - redmine-plugin/rspec:
+          plugin: redmine_github
+      - run:
+          name: Check if the test result file exists
+          command: test -f /tmp/rspec/rspec.xml
+  test-bundle-install-and-test:
+    executor:
+      name: redmine-plugin/ruby-sqlite3
+      ruby_version: '2.4'
+    steps:
+      - checkout # To resolve ssh problems with git later
+      - redmine-plugin/download-redmine:
+          version: '3.4.12'
+      - redmine-plugin/install-plugin:
+          repository: https://github.com/Loriowar/redmine_issues_tree.git
+      - run:
+          name: Create Gemfile.local
+          command: touch redmine/Gemfile.local
+      - redmine-plugin/generate-database_yml
+      - redmine-plugin/bundle-install
+      - redmine-plugin/test:
+          plugin: redmine_issues_tree
+
 
 workflows:
-  release:
+  lint-pack-validate-start-tests:
+    unless: << pipeline.parameters.run-integration-tests >>
     jobs:
-      - orb-tools/lint
+      - orb-tools/lint:
+          name: Lint Orb
       - orb-tools/pack:
+          name: Pack Orb
           requires:
-            - orb-tools/lint
+            - Lint Orb
       - orb-tools/publish-dev:
+          name: Publish dev version
           orb-name: agileware-jp/redmine-plugin
           requires:
-            - orb-tools/pack
-          filters:
-            branches:
-              ignore: master
-      - orb-tools/increment:
-          attach-workspace: true
-          orb-ref: agileware-jp/redmine-plugin
+            - Pack Orb
+      - orb-tools/trigger-integration-tests-workflow:
+          name: Start integration tests
           requires:
-            - orb-tools/pack
+            - Publish dev version
+  test-and-release:
+    when: << pipeline.parameters.run-integration-tests >>
+    jobs:
+      - test-download-redmine
+      - test-download-redmine-trunk
+      - test-install-plugin
+      - test-install-self
+      - test-generate-database_yml
+      - test-bundle-install-and-rspec
+      - test-bundle-install-and-test
+
+      # publish a semver version of the orb. relies on
+      # the commit subject containing the text "[semver:patch|minor|major|skip]"
+      # as that will determine whether a patch, minor or major
+      # version will be published or if publishing should
+      # be skipped.
+      # e.g. [semver:patch] will cause a patch version to be published.
+      - orb-tools/dev-promote-prod-from-commit-subject:
+          add-pr-comment: false
+          fail-if-semver-not-indicated: true
+          orb-name: agileware-jp/redmine-plugin
+          publish-version-tag: false
+          requires:
+            - test-download-redmine
+            - test-download-redmine-trunk
+            - test-install-plugin
+            - test-install-self
+            - test-generate-database_yml
+            - test-bundle-install-and-rspec
+            - test-bundle-install-and-test
           filters:
             branches:
               only: master

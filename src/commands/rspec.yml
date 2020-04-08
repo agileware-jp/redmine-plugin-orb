@@ -1,0 +1,78 @@
+description: Run RSpec
+
+parameters:
+  redmine_root:
+    description: Directory where redmine is installed
+    type: string
+    default: redmine
+  test_result_path:
+    description: |
+      Path where XML test results will be saved.
+      Set to empty string to deactivate output
+    type: string
+    default: /tmp/rspec
+  options:
+    description: Command line options to pass to rspec
+    type: string
+    default: --format progress
+  test_migration_rollback:
+    description: Test migration rollback?
+    type: boolean
+    default: true
+  plugin:
+    description: Plugin name. If unspecified it will be the current repository's plugin.
+    type: string
+    default: ''
+
+steps:
+  - run:
+      name: Setup Database
+      working_directory: '<< parameters.redmine_root >>'
+      command: RAILS_ENV=test bundle exec rake db:create db:migrate redmine:plugins
+  - run:
+      name: Initialize RSpec
+      working_directory: '<< parameters.redmine_root >>'
+      command: RAILS_ENV=test bundle exec rails generate rspec:install
+  - when:
+      condition: << parameters.test_result_path  >>
+      steps:
+        run:
+          name: Prepare .rspec
+          working_directory: '<< parameters.redmine_root >>'
+          command: |
+            echo '--format RspecJunitFormatter' >> .rspec
+            echo '-o << parameters.test_result_path >>/rspec.xml' >> .rspec
+            if ! egrep 'rspec_junit_formatter' Gemfile.*; then
+              bundle add rspec_junit_formatter
+            fi
+  - run:
+      name: Set tested plugin
+      working_directory: '<< parameters.redmine_root >>'
+      command: |
+        PLUGIN_NAME='<< parameters.plugin >>'
+        if [ -z $PLUGIN_NAME ]; then
+          PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
+        fi
+
+        echo $PLUGIN_NAME >> .tested_plugin
+  - run:
+      working_directory: '<< parameters.redmine_root >>'
+      command: |
+        echo '<< parameters.options >>' >> .rspec
+
+        RAILS_ENV=test bundle exec rspec plugins/`cat .tested_plugin`/spec
+  - when:
+      condition: << parameters.test_result_path  >>
+      steps:
+        - store_artifacts:
+            path: << parameters.test_result_path >>/rspec.xml
+            destination: rspec.xml
+        - store_test_results:
+            path: << parameters.test_result_path >>
+  - when:
+      condition: << parameters.test_migration_rollback  >>
+      steps:
+        - run:
+            name: Test migration rollback
+            working_directory: '<< parameters.redmine_root >>'
+            command: RAILS_ENV=test bundle exec rake redmine:plugins:migrate NAME=`cat .tested_plugin` VERSION=0

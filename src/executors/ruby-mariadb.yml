@@ -10,6 +10,5 @@ parameters:
 docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
     environment:
-      RAILS_ENV: test
       DATABASE_ADAPTER: mysql2
   - image: circleci/mariadb:<< parameters.mariadb_version >>
