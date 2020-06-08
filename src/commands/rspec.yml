@@ -54,7 +54,7 @@ steps:
           PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
         fi
 
-        echo $PLUGIN_NAME >> .tested_plugin
+        echo $PLUGIN_NAME > .tested_plugin
   - run:
       working_directory: '<< parameters.redmine_root >>'
       command: |
