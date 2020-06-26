@@ -19,6 +19,10 @@ parameters:
     description: Test migration rollback?
     type: boolean
     default: true
+  with_coverage:
+    description: Measure test coverage with simplecov
+    type: boolean
+    default: true
   plugin:
     description: Plugin name. If unspecified it will be the current repository's plugin.
     type: string
@@ -33,6 +37,16 @@ steps:
       name: Initialize RSpec
       working_directory: '<< parameters.redmine_root >>'
       command: RAILS_ENV=test bundle exec rails generate rspec:install
+  - when:
+      condition: << parameters.with_coverage  >>
+      steps:
+        - run:
+            name: Prepare simplecov setting file
+            command: |
+              echo "require 'simplecov'" >> spec/rails_helper.rb
+              echo "SimpleCov.root('plugins/${CIRCLE_PROJECT_REPONAME}')" >> spec/rails_helper.rb
+              echo "SimpleCov.coverage_dir('/tmp/coverage')" >> spec/rails_helper.rb
+              echo "SimpleCov.start('rails') { add_filter 'spec' }" >> spec/rails_helper.rb
   - when:
       condition: << parameters.test_result_path  >>
       steps:
@@ -69,6 +83,12 @@ steps:
             destination: rspec.xml
         - store_test_results:
             path: << parameters.test_result_path >>
+  - when:
+      condition: << parameters.with_coverage  >>
+      steps:
+        - store_artifacts:
+            path: /tmp/coverage
+            destination: coverage
   - when:
       condition: << parameters.test_migration_rollback  >>
       steps:
