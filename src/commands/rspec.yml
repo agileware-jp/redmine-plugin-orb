@@ -32,7 +32,7 @@ steps:
   - run:
       name: Initialize RSpec
       working_directory: '<< parameters.redmine_root >>'
-      command: RAILS_ENV=test bundle exec rails generate rspec:install
+      command: RAILS_ENV=test bundle exec rails generate rspec:install --force
   - when:
       condition: << parameters.test_result_path  >>
       steps:
@@ -54,7 +54,7 @@ steps:
           PLUGIN_NAME=$CIRCLE_PROJECT_REPONAME
         fi
 
-        echo $PLUGIN_NAME >> .tested_plugin
+        echo $PLUGIN_NAME > .tested_plugin
   - run:
       working_directory: '<< parameters.redmine_root >>'
       command: |
