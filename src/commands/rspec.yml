@@ -42,6 +42,7 @@ steps:
       steps:
         - run:
             name: Prepare simplecov setting file
+            working_directory: '<< parameters.redmine_root >>'
             command: |
               echo "require 'simplecov'" >> spec/rails_helper.rb
               echo "SimpleCov.root('plugins/${CIRCLE_PROJECT_REPONAME}')" >> spec/rails_helper.rb
