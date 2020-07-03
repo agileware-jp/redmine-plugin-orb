@@ -1,0 +1,29 @@
+description: Run yarn build to build plugin assets (requires Docker)
+
+parameters:
+  cache_key_prefix:
+    description: Prefix of cache key
+    type: string
+    default: redmine-plugin-build-cache-
+  plugin_folder:
+    description: Plugin folder
+    type: string
+
+steps:
+  - run:
+      working_directory: '<< parameters.plugin_folder >>'
+      command: git rev-parse HEAD > .commit
+  - restore_cache:
+      keys:
+        - '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.commit" }}'
+  - run:
+      working_directory: '<< parameters.plugin_folder >>'
+      command: |
+        if [ ! -f assets/.build_finished ]; then
+          docker run -u root -v `pwd`:/plugin -w /plugin circleci/node:`cat .node-version` /bin/bash -c "yarn install && yarn build"
+          touch assets/.build_finished
+        fi
+  - save_cache:
+      key: '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.commit" }}'
+      paths:
+        - '<< parameters.plugin_folder >>/assets'
