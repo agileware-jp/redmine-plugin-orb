@@ -6,7 +6,7 @@ parameters:
     type: string
     default: redmine
   repository:
-    description: Repository containingg Redmine plugin
+    description: Repository containing Redmine plugin
     type: string
   branch:
     description: Repository branch to check out
