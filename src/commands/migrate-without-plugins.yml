@@ -1,0 +1,18 @@
+description: Migrate without plugins
+
+parameters:
+  redmine_root:
+    description: Directory where redmine is installed
+    type: string
+    default: redmine
+
+steps:
+  - run:
+      name: run db:migrate without plugins
+      command: |
+        mkdir -p /tmp/temp-plugins
+        mv plugins/* /tmp/temp-plugins/.
+        RAILS_ENV=test bundle exec rake db:create db:migrate
+        mv /tmp/temp-plugins/* plugins/.
+        rm -rf /tmp/temp-plugins
+      working_directory: << parameters.redmine_root >>
