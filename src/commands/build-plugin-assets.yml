@@ -11,12 +11,14 @@ parameters:
 
 steps:
   - run:
+      name: Determine commit for cache
       working_directory: '<< parameters.plugin_folder >>'
       command: git rev-parse HEAD > .commit
   - restore_cache:
       keys:
         - '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.commit" }}'
   - run:
+      name: Build assets
       working_directory: '<< parameters.plugin_folder >>'
       command: |
         if [ ! -f assets/.build_finished ]; then
