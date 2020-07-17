@@ -129,7 +129,7 @@ jobs: # Integration Testing jobs
                 "version": "1.0.0",
                 "license": "MIT",
                 "scripts": {
-                  "build": "mdkir assets && touch assets/test.js"
+                  "build": "mkdir assets && touch assets/test.js"
                 }
               }
             EOF
@@ -153,7 +153,7 @@ jobs: # Integration Testing jobs
                 "version": "1.0.0",
                 "license": "MIT",
                 "scripts": {
-                  "build": "mdkir assets && touch assets/test.js"
+                  "build": "mkdir assets && touch assets/test.js"
                 }
               }
             EOF
