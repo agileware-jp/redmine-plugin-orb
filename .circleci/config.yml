@@ -116,6 +116,56 @@ jobs: # Integration Testing jobs
       - redmine-plugin/bundle-install
       - redmine-plugin/test:
           plugin: redmine_issues_tree
+  test-build-plugin-assets:
+    docker:
+      - image: circleci/node:12.18.2
+    steps:
+      - run:
+          name: Create package.json that just creates a assets/test.js
+          command: |
+            cat \<<-'EOF' > package.json
+            {
+              "name": "test",
+              "version": "1.0.0",
+              "license": "MIT",
+              "scripts": {
+                "build": "mdkir assets && touch assets/test.js",
+              },
+            }
+          EOF
+            yarn install # Generate yarn.lock
+            rm -rf node_modules
+      - redmine-plugin/build-plugin-assets:
+          plugin_folder: '~/project'
+          cache_key_prefix: build-without-docker
+      - run:
+          name: Check if the built file exists
+          command: test -f ~/project/assets/test.js
+  test-build-plugin-assets-with-docker:
+    machine: true
+    steps:
+      - run:
+          name: Create package.json that just creates a assets/test.js
+          command: |
+            cat \<<-'EOF' > package.json
+            {
+              "name": "test",
+              "version": "1.0.0",
+              "license": "MIT",
+              "scripts": {
+                "build": "mdkir assets && touch assets/test.js",
+              },
+            }
+          EOF
+            yarn install # Generate yarn.lock
+            rm -rf node_modules
+      - redmine-plugin/build-plugin-assets:
+          plugin_folder: '~/project'
+          use_docker: true
+          cache_key_prefix: build-with-docker
+      - run:
+          name: Check if the built file exists
+          command: test -f ~/project/assets/test.js
 
 
 workflows:
