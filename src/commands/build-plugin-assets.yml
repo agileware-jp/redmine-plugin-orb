@@ -10,22 +10,21 @@ parameters:
     type: string
 
 steps:
-  - run:
-      name: Determine commit for cache
-      working_directory: '<< parameters.plugin_folder >>'
-      command: git rev-parse HEAD > .commit
   - restore_cache:
       keys:
-        - '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.commit" }}'
+        - '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum ".node-version" }}-{{ checksum "yarn.lock" }}'
+  - run:
+      name: Install dependencies
+      working_directory: '<< parameters.plugin_folder >>'
+      command: |
+        if [ ! -d node_modules ]; then
+          docker run -u root -v `pwd`:/plugin -w /plugin circleci/node:`cat .node-version` yarn install
+        fi
+  - save_cache:
+      key: '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum ".node-version" }}-{{ checksum "yarn.lock" }}'
+      paths:
+        - '<< parameters.plugin_folder >>/node_modules'
   - run:
       name: Build assets
       working_directory: '<< parameters.plugin_folder >>'
-      command: |
-        if [ ! -f assets/.build_finished ]; then
-          docker run -u root -v `pwd`:/plugin -w /plugin circleci/node:`cat .node-version` /bin/bash -c "yarn install && yarn build"
-          touch assets/.build_finished
-        fi
-  - save_cache:
-      key: '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.commit" }}'
-      paths:
-        - '<< parameters.plugin_folder >>/assets'
+      command: docker run -u root -v `pwd`:/plugin -w /plugin circleci/node:`cat .node-version` yarn build
