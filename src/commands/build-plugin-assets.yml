@@ -20,7 +20,7 @@ parameters:
 steps:
   - restore_cache:
       keys:
-        - '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum ".node-version" }}-{{ checksum "yarn.lock" }}'
+        - '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.node-version" }}-{{ checksum "<< parameters.plugin_folder >>/yarn.lock" }}'
   - run:
       name: Install dependencies
       working_directory: '<< parameters.plugin_folder >>'
@@ -29,7 +29,7 @@ steps:
           <<# parameters.use_docker >>docker run -u root -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version`<</ parameters.use_docker >> yarn install --frozen-lockfile
         fi
   - save_cache:
-      key: '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum ".node-version" }}-{{ checksum "yarn.lock" }}'
+      key: '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.node-version" }}-{{ checksum "<< parameters.plugin_folder >>/yarn.lock" }}'
       paths:
         - '<< parameters.plugin_folder >>/node_modules'
   - run:
