@@ -197,6 +197,8 @@ workflows:
       - test-generate-database_yml
       - test-bundle-install-and-rspec
       - test-bundle-install-and-test
+      - test-build-plugin-assets
+      - test-build-plugin-assets-with-docker
 
       # publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
@@ -217,6 +219,8 @@ workflows:
             - test-generate-database_yml
             - test-bundle-install-and-rspec
             - test-bundle-install-and-test
+            - test-build-plugin-assets
+            - test-build-plugin-assets-with-docker
           filters:
             branches:
               only: master
