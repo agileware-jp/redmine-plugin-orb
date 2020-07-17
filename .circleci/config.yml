@@ -120,21 +120,10 @@ jobs: # Integration Testing jobs
     docker:
       - image: circleci/node:12.18.2
     steps:
+      - checkout
       - run:
-          name: Create package.json that just creates a assets/test.js
-          command: |
-            cat \<<-'EOF' > package.json
-              {
-                "name": "test",
-                "version": "1.0.0",
-                "license": "MIT",
-                "scripts": {
-                  "build": "mkdir assets && touch assets/test.js"
-                }
-              }
-            EOF
-            echo '12.18.2' > .node-version
-            touch yarn.lock
+          name: Set .node-version
+          command: echo '12.18.2' > .node-version
       - redmine-plugin/build-plugin-assets:
           plugin_folder: '~/project'
           cache_key_prefix: build-without-docker
@@ -144,21 +133,10 @@ jobs: # Integration Testing jobs
   test-build-plugin-assets-with-docker:
     machine: true
     steps:
+      - checkout
       - run:
-          name: Create package.json that just creates a assets/test.js
-          command: |
-            cat \<<-'EOF' > package.json
-              {
-                "name": "test",
-                "version": "1.0.0",
-                "license": "MIT",
-                "scripts": {
-                  "build": "mkdir assets && touch assets/test.js"
-                }
-              }
-            EOF
-            echo '12.18.2' > .node-version
-            touch yarn.lock
+          name: Set .node-version
+          command: echo '12.18.2' > .node-version
       - redmine-plugin/build-plugin-assets:
           plugin_folder: '~/project'
           use_docker: true
