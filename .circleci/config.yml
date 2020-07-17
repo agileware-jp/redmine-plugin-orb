@@ -124,15 +124,15 @@ jobs: # Integration Testing jobs
           name: Create package.json that just creates a assets/test.js
           command: |
             cat \<<-'EOF' > package.json
-            {
-              "name": "test",
-              "version": "1.0.0",
-              "license": "MIT",
-              "scripts": {
-                "build": "mdkir assets && touch assets/test.js",
-              },
-            }
-          EOF
+              {
+                "name": "test",
+                "version": "1.0.0",
+                "license": "MIT",
+                "scripts": {
+                  "build": "mdkir assets && touch assets/test.js",
+                },
+              }
+            EOF
             yarn install # Generate yarn.lock
             rm -rf node_modules
       - redmine-plugin/build-plugin-assets:
@@ -148,15 +148,15 @@ jobs: # Integration Testing jobs
           name: Create package.json that just creates a assets/test.js
           command: |
             cat \<<-'EOF' > package.json
-            {
-              "name": "test",
-              "version": "1.0.0",
-              "license": "MIT",
-              "scripts": {
-                "build": "mdkir assets && touch assets/test.js",
-              },
-            }
-          EOF
+              {
+                "name": "test",
+                "version": "1.0.0",
+                "license": "MIT",
+                "scripts": {
+                  "build": "mdkir assets && touch assets/test.js",
+                },
+              }
+            EOF
             yarn install # Generate yarn.lock
             rm -rf node_modules
       - redmine-plugin/build-plugin-assets:
