@@ -133,6 +133,7 @@ jobs: # Integration Testing jobs
                 }
               }
             EOF
+            echo '12.18.2' > .node-version
             yarn install # Generate yarn.lock
             rm -rf node_modules
       - redmine-plugin/build-plugin-assets:
@@ -157,6 +158,7 @@ jobs: # Integration Testing jobs
                 }
               }
             EOF
+            echo '12.18.2' > .node-version
             yarn install # Generate yarn.lock
             rm -rf node_modules
       - redmine-plugin/build-plugin-assets:
