@@ -18,7 +18,7 @@ steps:
       working_directory: '<< parameters.plugin_folder >>'
       command: |
         if [ ! -d node_modules ]; then
-          docker run -u root -v `pwd`:/plugin -w /plugin circleci/node:`cat .node-version` yarn install
+          docker run -u root -v `pwd`:/plugin -w /plugin circleci/node:`cat .node-version` yarn install --frozen-lockfile
         fi
   - save_cache:
       key: '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum ".node-version" }}-{{ checksum "yarn.lock" }}'
