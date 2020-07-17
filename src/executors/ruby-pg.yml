@@ -3,7 +3,7 @@ parameters:
     description: version of Ruby
     type: string
     default: latest
-  pg_version:
+  db_version:
     description: version of PostgreSQL
     type: string
     default: latest-ram
@@ -11,6 +11,6 @@ docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
     environment:
       DATABASE_ADAPTER: postgresql
-  - image: circleci/postgres:<< parameters.pg_version >>
+  - image: circleci/postgres:<< parameters.db_version >>
     environment:
       POSTGRES_PASSWORD: password
