@@ -67,7 +67,6 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if Gemfile.local was copied
           command: test -f redmine/Gemfile.local
-
   test-generate-database_yml:
     executor: redmine-plugin/ruby-mysql
     steps:
@@ -77,7 +76,6 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if the correct database.yml was created
           command: 'egrep "adapter: mysql2" redmine/config/database.yml'
-
   test-bundle-install-and-rspec:
     executor:
       name: redmine-plugin/ruby-sqlite3
