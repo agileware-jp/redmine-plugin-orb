@@ -134,8 +134,7 @@ jobs: # Integration Testing jobs
               }
             EOF
             echo '12.18.2' > .node-version
-            yarn install # Generate yarn.lock
-            rm -rf node_modules
+            touch yarn.lock
       - redmine-plugin/build-plugin-assets:
           plugin_folder: '~/project'
           cache_key_prefix: build-without-docker
@@ -159,8 +158,7 @@ jobs: # Integration Testing jobs
               }
             EOF
             echo '12.18.2' > .node-version
-            yarn install # Generate yarn.lock
-            rm -rf node_modules
+            touch yarn.lock
       - redmine-plugin/build-plugin-assets:
           plugin_folder: '~/project'
           use_docker: true
