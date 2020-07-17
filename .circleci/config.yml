@@ -129,8 +129,8 @@ jobs: # Integration Testing jobs
                 "version": "1.0.0",
                 "license": "MIT",
                 "scripts": {
-                  "build": "mdkir assets && touch assets/test.js",
-                },
+                  "build": "mdkir assets && touch assets/test.js"
+                }
               }
             EOF
             yarn install # Generate yarn.lock
@@ -153,8 +153,8 @@ jobs: # Integration Testing jobs
                 "version": "1.0.0",
                 "license": "MIT",
                 "scripts": {
-                  "build": "mdkir assets && touch assets/test.js",
-                },
+                  "build": "mdkir assets && touch assets/test.js"
+                }
               }
             EOF
             yarn install # Generate yarn.lock
