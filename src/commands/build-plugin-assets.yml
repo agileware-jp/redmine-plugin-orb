@@ -1,4 +1,4 @@
-description: Run yarn build to build plugin assets (requires Docker)
+description: Run yarn build to build plugin assets.
 
 parameters:
   cache_key_prefix:
@@ -8,6 +8,14 @@ parameters:
   plugin_folder:
     description: Plugin folder
     type: string
+  use_docker:
+    description: Should the build happen inside a docker container?
+    type: boolean
+    default: false
+  build_docker_container:
+    description: Container that should be used for building with docker (tag will be specified by `(plugin_folder)/.node-version`).
+    type: string
+    default: circleci/node
 
 steps:
   - restore_cache:
@@ -18,7 +26,7 @@ steps:
       working_directory: '<< parameters.plugin_folder >>'
       command: |
         if [ ! -d node_modules ]; then
-          docker run -u root -v `pwd`:/plugin -w /plugin circleci/node:`cat .node-version` yarn install --frozen-lockfile
+          <<# parameters.use_docker >>docker run -u root -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version`<</ parameters.use_docker >> yarn install --frozen-lockfile
         fi
   - save_cache:
       key: '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum ".node-version" }}-{{ checksum "yarn.lock" }}'
@@ -27,4 +35,4 @@ steps:
   - run:
       name: Build assets
       working_directory: '<< parameters.plugin_folder >>'
-      command: docker run -u root -v `pwd`:/plugin -w /plugin circleci/node:`cat .node-version` yarn build
+      command: <<# parameters.use_docker >>docker run -u root -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version`<</ parameters.use_docker >> yarn build
