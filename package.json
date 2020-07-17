@@ -1,0 +1,8 @@
+{
+  "name": "this_file_is_only_for_orb_testing",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "mkdir assets && touch assets/test.js"
+  }
+}

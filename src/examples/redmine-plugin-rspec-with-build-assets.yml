@@ -1,0 +1,60 @@
+usage:
+  version: 2.1
+
+  orbs:
+    redmine: agileware-jp/redmine-plugin@x.y.z
+
+  jobs:
+    build:
+      docker:
+        - image: circleci/node:12.13.1
+      steps:
+        - checkout
+        - redmine-plugin/build-plugin-assets:
+            plugin_folder: '~/project'
+            # Use use_docker: true and a machine executor if you need to build in several different nodejs environments
+        - persist_to_workspace:
+            root: '~/project'
+            paths:
+              - assets
+    run-tests:
+      parameters:
+        redmine_version:
+          type: string
+        ruby_version:
+          type: string
+        database:
+          type: enum
+          enum: ['mysql', 'pg', 'mariadb', 'sqlite']
+      executor:
+        name: redmine-plugin/ruby-<< parameters.database >>
+        ruby_version: << parameters.ruby_version >>
+      steps:
+        - checkout
+        - redmine/download-redmine:
+            version: << parameters.redmine_version >>
+        - redmine/install-self
+        - attach_workspace:
+            at: ~/project/redmine/plugins/tested_plugin # Attach built assets
+        - redmine-plugin/generate-database_yml
+        - redmine-plugin/bundle-install
+        - redmine-plugin/rspec
+
+  workflows:
+    version: 2
+    test:
+      jobs:
+        - build
+        - run-tests:
+            redmine_version: '4.1.0'
+            ruby_version: '2.6'
+            database: 'pg'
+            requires:
+              - build
+        - run-tests:
+            redmine_version: '4.1.0'
+            ruby_version: '2.6'
+            database: 'mysql'
+            requires:
+              - build
+        # Add more configurations as you like

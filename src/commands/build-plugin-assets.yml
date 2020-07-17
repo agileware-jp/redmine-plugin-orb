@@ -1,0 +1,59 @@
+description: Run yarn build to build plugin assets.
+
+parameters:
+  cache_key_prefix:
+    description: Prefix of cache key
+    type: string
+    default: redmine-plugin-build-cache
+  plugin_folder:
+    description: Plugin folder
+    type: string
+  use_docker:
+    description: Should the build happen inside a docker container?
+    type: boolean
+    default: false
+  build_docker_container:
+    description: Container that should be used for building with docker (tag will be specified by `(plugin_folder)/.node-version`).
+    type: string
+    default: circleci/node
+
+steps:
+  - restore_cache:
+      keys:
+        - '<< parameters.cache_key_prefix >>-<< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.node-version" }}-{{ checksum "<< parameters.plugin_folder >>/yarn.lock" }}'
+  - run:
+      name: Install dependencies
+      working_directory: '<< parameters.plugin_folder >>'
+      command: |
+        if [ ! -d node_modules ]; then
+          <<# parameters.use_docker >>docker run -u root -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version`<</ parameters.use_docker >> yarn install --frozen-lockfile
+        fi
+  - save_cache:
+      key: '<< parameters.cache_key_prefix >>-<< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.node-version" }}-{{ checksum "<< parameters.plugin_folder >>/yarn.lock" }}'
+      paths:
+        - '<< parameters.plugin_folder >>/node_modules'
+  - run:
+      name: Determine commit for cache
+      working_directory: '<< parameters.plugin_folder >>'
+      command: git rev-parse HEAD > .commit
+  - restore_cache:
+      keys:
+        - '<< parameters.cache_key_prefix >>-<< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.commit" }}'
+  - run:
+      name: Build assets
+      working_directory: '<< parameters.plugin_folder >>'
+      command: |
+        if [ ! -f assets/.build_finished ]; then
+          <<# parameters.use_docker >>export USE_DOCKER='1'<</ parameters.use_docker >>
+
+          if [ -n "${USE_DOCKER}" ]; then
+            docker run -u root -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version` /bin/bash -c "yarn build && touch assets/.build_finished"
+          else
+            yarn build
+            touch assets/.build_finished
+          fi
+        fi
+  - save_cache:
+      key: '<< parameters.cache_key_prefix >>-<< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.commit" }}'
+      paths:
+        - '<< parameters.plugin_folder >>/assets'
