@@ -26,10 +26,10 @@ steps:
       working_directory: '<< parameters.plugin_folder >>'
       command: |
         if [ ! -d node_modules ]; then
-          <<# parameters.use_docker >>docker run -u root -v `pwd`:/home/circleci/plugin -w /home/circleci/plugin << parameters.build_docker_container >>:`cat .node-version`<</ parameters.use_docker >> yarn install --frozen-lockfile
+          <<# parameters.use_docker >>docker run -u root -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version`<</ parameters.use_docker >> yarn install --frozen-lockfile
         fi
   - save_cache:
-      key: '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.node-version" }}-{{ checksum "<< parameters.plugin_folder >>/yarn.lock" }}'
+      key: '<< parameters.cache_key_prefix >>-<< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.node-version" }}-{{ checksum "<< parameters.plugin_folder >>/yarn.lock" }}'
       paths:
         - '<< parameters.plugin_folder >>/node_modules'
   - run:
@@ -44,8 +44,7 @@ steps:
       working_directory: '<< parameters.plugin_folder >>'
       command: |
         if [ ! -f assets/.build_finished ]; then
-          <<# parameters.use_docker >>docker run -v `pwd`:/home/circleci/plugin -w /home/circleci/plugin << parameters.build_docker_container >>:`cat .node-version`<</ parameters.use_docker >> yarn build
-          touch assets/.build_finished
+          <<# parameters.use_docker >>docker run -u root -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version` /bin/bash -c<</ parameters.use_docker >> "yarn build && touch assets/.build_finished"
         fi
   - save_cache:
       key: '<< parameters.cache_key_prefix >>-<< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.commit" }}'
