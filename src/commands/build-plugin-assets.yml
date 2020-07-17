@@ -44,7 +44,14 @@ steps:
       working_directory: '<< parameters.plugin_folder >>'
       command: |
         if [ ! -f assets/.build_finished ]; then
-          <<# parameters.use_docker >>docker run -u root -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version` /bin/bash -c<</ parameters.use_docker >> "yarn build && touch assets/.build_finished"
+          <<# parameters.use_docker >>export USE_DOCKER='1'<</ parameters.use_docker >>
+
+          if [ -n "${USE_DOCKER}" ]; then
+            docker run -u root -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version` /bin/bash -c "yarn build && touch assets/.build_finished"
+          else
+            yarn build
+            touch assets/.build_finished
+          fi
         fi
   - save_cache:
       key: '<< parameters.cache_key_prefix >>-<< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.commit" }}'
