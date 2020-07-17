@@ -4,7 +4,7 @@ parameters:
   cache_key_prefix:
     description: Prefix of cache key
     type: string
-    default: redmine-plugin-build-cache-
+    default: redmine-plugin-build-cache
   plugin_folder:
     description: Plugin folder
     type: string
@@ -20,7 +20,7 @@ parameters:
 steps:
   - restore_cache:
       keys:
-        - '<< parameters.cache_key_prefix >><< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.node-version" }}-{{ checksum "<< parameters.plugin_folder >>/yarn.lock" }}'
+        - '<< parameters.cache_key_prefix >>-<< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.node-version" }}-{{ checksum "<< parameters.plugin_folder >>/yarn.lock" }}'
   - run:
       name: Install dependencies
       working_directory: '<< parameters.plugin_folder >>'
@@ -33,6 +33,21 @@ steps:
       paths:
         - '<< parameters.plugin_folder >>/node_modules'
   - run:
+      name: Determine commit for cache
+      working_directory: '<< parameters.plugin_folder >>'
+      command: git rev-parse HEAD > .commit
+  - restore_cache:
+      keys:
+        - '<< parameters.cache_key_prefix >>-<< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.commit" }}'
+  - run:
       name: Build assets
       working_directory: '<< parameters.plugin_folder >>'
-      command: <<# parameters.use_docker >>docker run -u root -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version`<</ parameters.use_docker >> yarn build
+      command: |
+        if [ ! -f assets/.build_finished ]; then
+          <<# parameters.use_docker >>docker run -u root -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version`<</ parameters.use_docker >> yarn build
+          touch assets/.build_finished
+        fi
+  - save_cache:
+      key: '<< parameters.cache_key_prefix >>-<< parameters.plugin_folder >>-{{ checksum "<< parameters.plugin_folder >>/.commit" }}'
+      paths:
+        - '<< parameters.plugin_folder >>/assets'
