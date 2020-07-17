@@ -44,7 +44,7 @@ steps:
       working_directory: '<< parameters.plugin_folder >>'
       command: |
         if [ ! -f assets/.build_finished ]; then
-          <<# parameters.use_docker >>docker run -u root -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version`<</ parameters.use_docker >> yarn build
+          <<# parameters.use_docker >>docker run -v `pwd`:/plugin -w /plugin << parameters.build_docker_container >>:`cat .node-version`<</ parameters.use_docker >> yarn build
           touch assets/.build_finished
         fi
   - save_cache:
