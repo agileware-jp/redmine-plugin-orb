@@ -2,7 +2,7 @@ usage:
   version: 2.1
 
   orbs:
-    redmine: agileware-jp/redmine-plugin@x.y.z
+    redmine-plugin: agileware-jp/redmine-plugin@x.y.z
 
   jobs:
     build:
@@ -31,9 +31,9 @@ usage:
         ruby_version: << parameters.ruby_version >>
       steps:
         - checkout
-        - redmine/download-redmine:
+        - redmine-plugin/download-redmine:
             version: << parameters.redmine_version >>
-        - redmine/install-self
+        - redmine-plugin/install-self
         - attach_workspace:
             at: ~/project/redmine/plugins/tested_plugin # Attach built assets
         - redmine-plugin/generate-database_yml

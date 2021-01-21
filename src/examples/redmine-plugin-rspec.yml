@@ -2,7 +2,7 @@ usage:
   version: 2.1
 
   orbs:
-    redmine: agileware-jp/redmine-plugin@x.y.z
+    redmine-plugin: agileware-jp/redmine-plugin@x.y.z
 
   jobs:
     run-tests:
@@ -19,9 +19,9 @@ usage:
         ruby_version: << parameters.ruby_version >>
       steps:
         - checkout
-        - redmine/download-redmine:
+        - redmine-plugin/download-redmine:
             version: << parameters.redmine_version >>
-        - redmine/install-self
+        - redmine-plugin/install-self
         # Add dependent plugins here
         # - redmine-plugin/install-plugin:
         #     repository: git@github.com:my-company/super_plugin.git
