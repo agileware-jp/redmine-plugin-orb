@@ -21,30 +21,17 @@ steps:
   - restore_cache:
       keys:
         - '<< parameters.cache_key_prefix >><< parameters.version >>'
-  - when:
-      condition: << parameters.redmica >>
-      steps:
-        - run:
-            name: Download Redmica << parameters.version >>
-            command: |
-              if [ ! -d redmine-<< parameters.version >> ]; then
-                curl -L https://github.com/redmica/redmica/archive/<< parameters.version >>.tar.gz | tar zx
-                echo '<< parameters.version >>' > redmine-<< parameters.version >>/.version
-              fi
-  - unless:
-      condition: << parameters.redmica >>
-      steps:
-        - run:
-            name: Download Redmine << parameters.version >>
-            command: |
-              if [ ! -d redmine-<< parameters.version >> ]; then
-                curl -L https://github.com/redmine/redmine/archive/<< parameters.version >>.tar.gz | tar zx
-                echo '<< parameters.version >>' > redmine-<< parameters.version >>/.version
-              fi
+  - run:
+      name: Download Redmine << parameters.version >>
+      command: |
+        if [ ! -d << paramters.product >>-<< parameters.version >> ]; then
+          curl -L https://github.com/redmine/redmine/archive/<< parameters.version >>.tar.gz | tar zx
+          echo '<< parameters.version >>' > << paramters.product >>-<< parameters.version >>/.version
+        fi
   - save_cache:
       key: '<< parameters.cache_key_prefix >><< parameters.version >>'
       paths:
-        - redmine-<< parameters.version >>
+        - << paramters.product >>-<< parameters.version >>
   - run:
       name: Move Redmine to << parameters.destination >>
-      command: mv redmine-<< parameters.version >> << parameters.destination >>
+      command: mv << paramters.product >>-<< parameters.version >> << parameters.destination >>
