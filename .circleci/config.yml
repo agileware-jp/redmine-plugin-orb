@@ -33,24 +33,24 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if there is a .version file containing the specified version
           command: test "`cat redmine/.version`" = "3.4.9"
-  # TODO: redmica であることを書いて
   test-download-redmica:
     executor: orb-tools/ubuntu
     steps:
       - redmine-plugin/download-redmine:
-          version: '3.4.9'
+          product: 'redmica'
+          version: '2.0.0'
       - run:
-          name: Check if redmine exists
-          command: test -f redmine/lib/redmine.rb
+          name: Check if redmica exists
+          command: test -f redmica/lib/redmine.rb
       - run:
-          name: Check if redmine has the downloaded version
+          name: Check if redmica has the downloaded version
           command: |
-            egrep "MAJOR.+3" redmine/lib/redmine/version.rb
-            egrep "MINOR.+4" redmine/lib/redmine/version.rb
-            egrep "TINY.+9" redmine/lib/redmine/version.rb
+            egrep -A 5 "module\s+RedMica" redmica/lib/redmine/version.rb | egrep "MAJOR.+2"
+            egrep -A 5 "module\s+RedMica" redmica/lib/redmine/version.rb | egrep "MINOR.+0"
+            egrep -A 5 "module\s+RedMica" redmica/lib/redmine/version.rb | egrep "TINY.+0"
       - run:
           name: Check if there is a .version file containing the specified version
-          command: test "`cat redmine/.version`" = "3.4.9"
+          command: test "`cat redmica/.version`" = "2.0.0"
   test-download-redmine-trunk:
     docker:
       - image: circleci/buildpack-deps:stretch-scm
