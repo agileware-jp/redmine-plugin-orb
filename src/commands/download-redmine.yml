@@ -12,10 +12,6 @@ parameters:
     description: Destination path
     type: string
     default: redmine
-  product:
-    type: enum
-    enum: ["redmine", "redmica"]
-    default: "redmine"
 
 steps:
   - restore_cache:
@@ -24,14 +20,14 @@ steps:
   - run:
       name: Download Redmine << parameters.version >>
       command: |
-        if [ ! -d << paramters.product >>-<< parameters.version >> ]; then
+        if [ ! -d redmine-<< parameters.version >> ]; then
           curl -L https://github.com/redmine/redmine/archive/<< parameters.version >>.tar.gz | tar zx
-          echo '<< parameters.version >>' > << paramters.product >>-<< parameters.version >>/.version
+          echo '<< parameters.version >>' > redmine-<< parameters.version >>/.version
         fi
   - save_cache:
       key: '<< parameters.cache_key_prefix >><< parameters.version >>'
       paths:
-        - << paramters.product >>-<< parameters.version >>
+        - redmine-<< parameters.version >>
   - run:
       name: Move Redmine to << parameters.destination >>
-      command: mv << paramters.product >>-<< parameters.version >> << parameters.destination >>
+      command: mv redmine-<< parameters.version >> << parameters.destination >>
