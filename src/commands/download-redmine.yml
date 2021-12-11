@@ -12,6 +12,11 @@ parameters:
     description: Destination path
     type: string
     default: redmine
+  product:
+    description: "'redmine' or 'redmica'"
+    type: enum
+    enum: ["redmine", "redmica"]
+    default: "redmine"
 
 steps:
   - restore_cache:
