@@ -39,19 +39,19 @@ jobs: # Integration Testing jobs
       - redmine-plugin/download-redmine:
           product: 'redmica'
           version: '2.0.0'
-          destination: 'redmica'
+          destination: 'wrk'
       - run:
           name: Check if redmica exists
-          command: test -f redmica/lib/redmine.rb
+          command: test -f wrk/lib/redmine.rb
       - run:
           name: Check if redmica has the downloaded version
           command: |
-            egrep -A 5 "module\s+RedMica" redmica/lib/redmine/version.rb | egrep "MAJOR.+2"
-            egrep -A 5 "module\s+RedMica" redmica/lib/redmine/version.rb | egrep "MINOR.+0"
-            egrep -A 5 "module\s+RedMica" redmica/lib/redmine/version.rb | egrep "TINY.+0"
+            egrep -A 5 "module\s+RedMica" wrk/lib/redmine/version.rb | egrep "MAJOR.+2"
+            egrep -A 5 "module\s+RedMica" wrk/lib/redmine/version.rb | egrep "MINOR.+0"
+            egrep -A 5 "module\s+RedMica" wrk/lib/redmine/version.rb | egrep "TINY.+0"
       - run:
           name: Check if there is a .version file containing the specified version
-          command: test "`cat redmica/.version`" = "2.0.0"
+          command: test "`cat wrk/.version`" = "2.0.0"
   test-download-redmine-trunk:
     docker:
       - image: circleci/buildpack-deps:stretch-scm
