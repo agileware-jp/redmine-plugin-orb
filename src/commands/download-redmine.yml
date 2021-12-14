@@ -23,16 +23,16 @@ steps:
       keys:
         - '<< parameters.cache_key_prefix >><< parameters.version >>'
   - run:
-      name: Download Redmine << parameters.version >>
+      name: Download << parameters.product >> << parameters.version >>
       command: |
-        if [ ! -d redmine-<< parameters.version >> ]; then
+        if [ ! -d << parameters.product >>-<< parameters.version >> ]; then
           curl -L https://github.com/redmine/redmine/archive/<< parameters.version >>.tar.gz | tar zx
-          echo '<< parameters.version >>' > redmine-<< parameters.version >>/.version
+          echo '<< parameters.version >>' > << parameters.product >>-<< parameters.version >>/.version
         fi
   - save_cache:
       key: '<< parameters.cache_key_prefix >><< parameters.version >>'
       paths:
-        - redmine-<< parameters.version >>
+        - << parameters.product >>-<< parameters.version >>
   - run:
-      name: Move Redmine to << parameters.destination >>
-      command: mv redmine-<< parameters.version >> << parameters.destination >>
+      name: Move << parameters.product >> to << parameters.destination >>
+      command: mv << parameters.product >>-<< parameters.version >> << parameters.destination >>
