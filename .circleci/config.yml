@@ -212,6 +212,7 @@ workflows:
           requires:
             - test-download-redmine
             - test-download-redmine-trunk
+            - test-download-redmica
             - test-install-plugin
             - test-install-self
             - test-generate-database_yml
