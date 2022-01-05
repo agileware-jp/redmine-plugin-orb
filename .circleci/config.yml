@@ -98,11 +98,11 @@ jobs: # Integration Testing jobs
   test-bundle-install-and-rspec:
     executor:
       name: redmine-plugin/ruby-sqlite3
-      ruby_version: '2.4'
+      ruby_version: '2.6'
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download-redmine:
-          version: '3.4.12'
+          version: '4.1.5'
       - redmine-plugin/install-plugin:
           repository: git@github.com:agileware-jp/redmine_github.git
       - run:
