@@ -33,6 +33,22 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if there is a .version file containing the specified version
           command: test "`cat redmine/.version`" = "3.4.9"
+  test-download-redmine-latest:
+    executor: orb-tools/ubuntu
+    steps:
+      - redmine-plugin/download-redmine:
+          version: latest
+      - run:
+          name: Check if redmine exists
+          command: test -f redmine/lib/redmine.rb
+      - run:
+          name: Check if there is a .version file containing latest version
+          command: |
+            cat redmine/.version
+            test $(cat redmine/.version) = $(
+              curl -s https://api.github.com/repos/redmine/redmine/tags |
+              jq -r '.[0].name'
+            )
   test-download-redmica:
     executor: orb-tools/ubuntu
     steps:
@@ -52,6 +68,25 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if there is a .version file containing the specified version
           command: test "`cat wrk/.version`" = "2.0.0"
+  test-download-redmica-latest:
+    executor: orb-tools/ubuntu
+    steps:
+      - redmine-plugin/download-redmine:
+          product: 'redmica'
+          version: latest
+          destination: 'wrk'
+      - run:
+          name: Check if redmica exists
+          command: egrep "module\s+RedMica" wrk/lib/redmine/version.rb
+      - run:
+          name: Check if there is a .version file containing latest version
+          command: |
+            cat wrk/.version
+            test $(cat wrk/.version) = $(
+              curl -s https://api.github.com/repos/redmica/redmica/tags |
+              jq -r '.[0].name' |
+              sed -e 's/^v//'
+            )
   test-download-redmine-trunk:
     docker:
       - image: circleci/buildpack-deps:stretch-scm
@@ -188,8 +223,10 @@ workflows:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
       - test-download-redmine
+      - test-download-redmine-latest
       - test-download-redmine-trunk
       - test-download-redmica
+      - test-download-redmica-latest
       - test-install-plugin
       - test-install-self
       - test-generate-database_yml
@@ -211,8 +248,10 @@ workflows:
           publish-version-tag: false
           requires:
             - test-download-redmine
+            - test-download-redmine-latest
             - test-download-redmine-trunk
             - test-download-redmica
+            - test-download-redmica-latest
             - test-install-plugin
             - test-install-self
             - test-generate-database_yml
