@@ -1,1 +1,1 @@
-# Redmine Plugin Orb 2.2.0
+# Redmine Plugin Orb 2.3.0
