@@ -8,6 +8,7 @@ parameters:
   version:
     description: Redmine version
     type: string
+    default: latest
   destination:
     description: Destination path
     type: string
@@ -19,9 +20,43 @@ parameters:
     default: "redmine"
 
 steps:
+  - when:
+      condition:
+        not:
+          equal: [ latest, << parameters.version >> ]
+      steps:
+        - run:
+            name: Create specified version file
+            command: |
+              echo << parameters.version >> > .version
+  - when:
+      condition:
+        and:
+          - equal: [ redmine, << parameters.product >> ]
+          - equal: [ latest, << parameters.version >> ]
+      steps:
+        - run:
+            name: Create latest Redmine version file
+            command: |
+              curl -s https://api.github.com/repos/redmine/redmine/tags |
+              jq -r '.[0].name' > .version
+              echo "$(cat .version) is latest Redmine version."
+  - when:
+      condition:
+        and:
+          - equal: [ redmica, << parameters.product >> ]
+          - equal: [ latest, << parameters.version >> ]
+      steps:
+        - run:
+            name: Create latest Redmica version file
+            command: |
+              curl -s https://api.github.com/repos/redmica/redmica/tags |
+              jq -r '.[0].name' |
+              sed -e 's/^v//' > .version
+              echo "$(cat .version) is latest Redmica version."
   - restore_cache:
       keys:
-        - '<< parameters.cache_key_prefix >><< parameters.version >>'
+        - '<< parameters.cache_key_prefix >><< parameters.product >>-<< parameters.version >>-{{ checksum ".version" }}'
   - when:
       condition:
         equal: [ redmine, << parameters.product >> ]
@@ -30,8 +65,12 @@ steps:
             name: Download << parameters.product >> << parameters.version >>
             command: |
               if [ ! -d << parameters.product >>-<< parameters.version >> ]; then
-                curl -L https://github.com/redmine/redmine/archive/<< parameters.version >>.tar.gz | tar zx
-                echo '<< parameters.version >>' > << parameters.product >>-<< parameters.version >>/.version
+                version="$(cat .version)"
+                curl -L "https://github.com/redmine/redmine/archive/$version.tar.gz" | tar zx
+                if [ "$version" != << parameters.version >> ]; then
+                  mv -v << parameters.product >>-"$version" << parameters.product >>-<< parameters.version >>
+                fi
+                cp -av .version << parameters.product >>-<< parameters.version >>/
               fi
   - when:
       condition:
@@ -42,11 +81,15 @@ steps:
             # https://github.com/redmica/redmica/archive/v2.0.0 # `v2.0.0` not `2.0.0`
             command: |
               if [ ! -d << parameters.product >>-<< parameters.version >> ]; then
-                curl -L https://github.com/redmica/redmica/archive/v<< parameters.version >>.tar.gz | tar zx
-                echo '<< parameters.version >>' > << parameters.product >>-<< parameters.version >>/.version
+                version="$(cat .version)"
+                curl -L "https://github.com/redmica/redmica/archive/v$version.tar.gz" | tar zx
+                if [ "$version" != << parameters.version >> ]; then
+                  mv -v << parameters.product >>-"$version" << parameters.product >>-<< parameters.version >>
+                fi
+                cp -av .version << parameters.product >>-<< parameters.version >>/
               fi
   - save_cache:
-      key: '<< parameters.cache_key_prefix >><< parameters.version >>'
+      key: '<< parameters.cache_key_prefix >><< parameters.product >>-<< parameters.version >>-{{ checksum ".version" }}'
       paths:
         - << parameters.product >>-<< parameters.version >>
   - run:
