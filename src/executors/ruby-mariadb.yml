@@ -11,4 +11,4 @@ docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
     environment:
       DATABASE_ADAPTER: mysql2
-  - image: circleci/mariadb:<< parameters.db_version >>
+  - image: cimg/mariadb:<< parameters.db_version >>
