@@ -6,7 +6,7 @@ parameters:
   db_version:
     description: version of MySQL
     type: string
-    default: latest-ram
+    default: "8.0"
 docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
     environment:

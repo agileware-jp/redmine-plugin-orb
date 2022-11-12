@@ -6,7 +6,7 @@ parameters:
   db_version:
     description: version of MariaDB
     type: string
-    default: latest-ram
+    default: "10.9"
 docker:
   - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
     environment:
