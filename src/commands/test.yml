@@ -15,6 +15,8 @@ parameters:
     default: ''
 
 steps:
+  - browser-tools/install-chrome
+  - browser-tools/install-chromedriver
   - run:
       name: Setup Database
       working_directory: '<< parameters.redmine_root >>'

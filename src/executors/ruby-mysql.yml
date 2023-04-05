@@ -2,14 +2,15 @@ parameters:
   ruby_version:
     description: version of Ruby
     type: string
-    default: latest
+    default: "3.2"
   db_version:
     description: version of MySQL
     type: string
     default: "8.0"
 docker:
-  - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
+  - image: cimg/ruby:<< parameters.ruby_version >>-browsers
     environment:
       DATABASE_ADAPTER: mysql2
   - image: cimg/mysql:<< parameters.db_version >>
-    command: mysqld --default-authentication-plugin=mysql_native_password
+    command:
+      ["mysqld",  "--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8mb4"]

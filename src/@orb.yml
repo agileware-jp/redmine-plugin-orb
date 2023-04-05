@@ -4,5 +4,9 @@ description: |
   Orbs for automated testing of plugins for Redmine (https://www.redmine.org/).
 
   Created and maintained by Agileware Inc. (https://agileware.jp/)
+
 display:
   source_url:  https://github.com/agileware-jp/redmine-plugin-orb
+
+orbs:
+  browser-tools: circleci/browser-tools@1.4.1

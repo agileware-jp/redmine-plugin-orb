@@ -2,13 +2,13 @@ parameters:
   ruby_version:
     description: version of Ruby
     type: string
-    default: latest
+    default: "3.2"
   db_version:
     description: version of PostgreSQL
     type: string
     default: "15.0"
 docker:
-  - image: circleci/ruby:<< parameters.ruby_version >>-node-browsers
+  - image: cimg/ruby:<< parameters.ruby_version >>-browsers
     environment:
       DATABASE_ADAPTER: postgresql
   - image: cimg/postgres:<< parameters.db_version >>
