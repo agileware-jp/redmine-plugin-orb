@@ -21,7 +21,7 @@ steps:
       name: Download Redmine trunk
       command: |
         if [ ! -d redmine-trunk ]; then
-          svn co --non-interactive --config-option servers:global:ssl-authority-files=<(curl -sL https://www.gandi.net/static/CAs/GandiStandardSSLCA2.pem) https://svn.redmine.org/redmine/trunk redmine-trunk
+          svn co --non-interactive https://svn.redmine.org/redmine/trunk redmine-trunk
           echo 'trunk' > redmine-trunk/.version
         fi
   - save_cache:
