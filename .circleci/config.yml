@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   redmine-plugin: agileware-jp/redmine-plugin@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.1.0
+  browser-tools: circleci/browser-tools@1.4.0
 
 # Pipeline parameters
 parameters:
@@ -172,7 +173,7 @@ jobs: # Integration Testing jobs
           plugin: redmine_issues_tree
   test-build-plugin-assets:
     docker:
-      - image: circleci/node:12.18.2
+      - image: cimg/node:12.18.2
     steps:
       - checkout
       - run:

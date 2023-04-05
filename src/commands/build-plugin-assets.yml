@@ -15,7 +15,7 @@ parameters:
   build_docker_container:
     description: Container that should be used for building with docker (tag will be specified by `(plugin_folder)/.node-version`).
     type: string
-    default: circleci/node
+    default: cimg/node
 
 steps:
   - restore_cache:

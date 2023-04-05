@@ -7,7 +7,7 @@ usage:
   jobs:
     build:
       docker:
-        - image: circleci/node:12.13.1
+        - image: cimg/node:12.13.1
       steps:
         - checkout
         - redmine-plugin/build-plugin-assets:
