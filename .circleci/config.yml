@@ -157,11 +157,11 @@ jobs: # Integration Testing jobs
   test-bundle-install-and-test:
     executor:
       name: redmine-plugin/ruby-sqlite3
-      ruby_version: '2.4'
+      ruby_version: '2.5'
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download-redmine:
-          version: '3.4.12'
+          version: '4.1.7'
       - redmine-plugin/install-plugin:
           repository: https://github.com/Loriowar/redmine_issues_tree.git
       - run:
