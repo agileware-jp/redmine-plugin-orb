@@ -20,6 +20,8 @@ parameters:
     default: "redmine"
 
 steps:
+  - run:
+      command: echo << parameters.version >>
   - when:
       condition:
         not:
