@@ -34,6 +34,24 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if there is a .version file containing the specified version
           command: test "`cat redmine/.version`" = "3.4.9"
+  test-download-redmine-supported-min-version:
+    executor: orb-tools/ubuntu
+    steps:
+      - redmine-plugin/download-redmine:
+          version: $REDMINE_MIN_VERSION
+      - run:
+          name: Check if redmine exists
+          command: test -f redmine/lib/redmine.rb
+      - run:
+          name: Check if redmine has the downloaded version
+          command: |
+            IFS='.' read -ra digits < <(echo "$REDMINE_MIN_VERSION")
+            egrep "MAJOR.+${digits[0]}" redmine/lib/redmine/version.rb
+            egrep "MINOR.+${digits[1]}" redmine/lib/redmine/version.rb
+            egrep "TINY.+${digits[2]}" redmine/lib/redmine/version.rb
+      - run:
+          name: Check if there is a .version file containing the specified version
+          command: test "`cat redmine/.version`" = "$REDMINE_MIN_VERSION"
   test-download-redmine-latest:
     executor: orb-tools/ubuntu
     steps:
@@ -50,6 +68,31 @@ jobs: # Integration Testing jobs
               curl -s https://api.github.com/repos/redmine/redmine/tags |
               jq -r '.[0].name'
             )
+  test-download-redmine-supported-max-version:
+    executor: orb-tools/ubuntu
+    steps:
+      - redmine-plugin/download-redmine:
+          version: $REDMINE_MAX_VERSION
+      - run:
+          name: Check if redmine exists
+          command: test -f redmine/lib/redmine.rb
+      - run:
+          name: Check if redmine has the downloaded version
+          command: |
+            version=$REDMINE_MAX_VERSION
+
+            if [ "$version" == "latest" ]; then
+              cat redmine/.version
+              test $(cat redmine/.version) = $(
+                curl -s https://api.github.com/repos/redmine/redmine/tags |
+                jq -r '.[0].name'
+              )
+            else
+              IFS='.' read -ra digits < <(echo "$version")
+              egrep "MAJOR.+${digits[0]}" redmine/lib/redmine/version.rb
+              egrep "MINOR.+${digits[1]}" redmine/lib/redmine/version.rb
+              egrep "TINY.+${digits[2]}" redmine/lib/redmine/version.rb
+            fi
   test-download-redmica:
     executor: orb-tools/ubuntu
     steps:
@@ -226,6 +269,12 @@ workflows:
       - test-download-redmine
       - test-download-redmine-latest
       - test-download-redmine-trunk
+      - test-download-redmine-supported-max-version:
+          context:
+            - lychee-ci-environment
+      - test-download-redmine-supported-min-version:
+          context:
+            - lychee-ci-environment
       - test-download-redmica
       - test-download-redmica-latest
       - test-install-plugin

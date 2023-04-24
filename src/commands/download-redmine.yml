@@ -20,40 +20,34 @@ parameters:
     default: "redmine"
 
 steps:
-  - when:
-      condition:
-        not:
-          equal: [ latest, << parameters.version >> ]
-      steps:
-        - run:
-            name: Create specified version file
-            command: |
-              echo << parameters.version >> > .version
-  - when:
-      condition:
-        and:
-          - equal: [ redmine, << parameters.product >> ]
-          - equal: [ latest, << parameters.version >> ]
-      steps:
-        - run:
-            name: Create latest Redmine version file
-            command: |
-              curl -s https://api.github.com/repos/redmine/redmine/tags |
-              jq -r '.[0].name' > .version
-              echo "$(cat .version) is latest Redmine version."
-  - when:
-      condition:
-        and:
-          - equal: [ redmica, << parameters.product >> ]
-          - equal: [ latest, << parameters.version >> ]
-      steps:
-        - run:
-            name: Create latest Redmica version file
-            command: |
-              curl -s https://api.github.com/repos/redmica/redmica/tags |
-              jq -r '.[0].name' |
-              sed -e 's/^v//' > .version
-              echo "$(cat .version) is latest Redmica version."
+  - run:
+      name: Determine Redmine/Redmica version
+      command: |
+        extract_latest_redmine_version() {
+          curl -s https://api.github.com/repos/redmine/redmine/tags |
+          jq -r '.[0].name' > .version
+        }
+
+        extract_latest_redmica_version() {
+          curl -s https://api.github.com/repos/redmica/redmica/tags |
+          jq -r '.[0].name' |
+          sed -e 's/^v//' > .version
+        }
+
+        version=<< parameters.version >>
+        product=<< parameters.product >>
+
+        echo $version > .version
+
+        if [ "$version" == "latest" ]; then
+          if [ "$product" == "redmine" ]; then
+            extract_latest_redmine_version
+          elif [ "$product" == "redmica" ]; then
+            extract_latest_redmica_version
+          fi
+        fi
+
+        echo "Test product: << parameters.product >>@$(cat .version)"
   - restore_cache:
       keys:
         - '<< parameters.cache_key_prefix >><< parameters.product >>-<< parameters.version >>-{{ checksum ".version" }}'
