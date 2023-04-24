@@ -9,6 +9,10 @@ parameters:
     description: Redmine version
     type: string
     default: latest
+  version_env:
+    description: Redmine version (via environment values)
+    type: env_var_name
+    default: UNSPECIFIED
   destination:
     description: Destination path
     type: string
@@ -22,8 +26,21 @@ parameters:
 steps:
   - when:
       condition:
-        not:
-          equal: [ latest, << parameters.version >> ]
+        and:
+          - equal: [ latest, << parameters.version >> ]
+          - not:
+              equal: [ latest, "${<< parameters.version_env >>}" ]
+      steps:
+        - run:
+            name: Create specified version file (via env values)
+            command: |
+              echo $<< parameters.version_env >> > .version
+  - when:
+      condition:
+        and:
+          - equal: [ UNSPECIFIED, "${<< parameters.version_env >>}" ]
+          - not:
+              equal: [ latest, << parameters.version >> ]
       steps:
         - run:
             name: Create specified version file
@@ -33,7 +50,9 @@ steps:
       condition:
         and:
           - equal: [ redmine, << parameters.product >> ]
-          - equal: [ latest, << parameters.version >> ]
+          - and:
+            - equal: [ latest, << parameters.version >> ]
+            - equal: [ latest, "${<< parameters.version_env >>}" ]
       steps:
         - run:
             name: Create latest Redmine version file

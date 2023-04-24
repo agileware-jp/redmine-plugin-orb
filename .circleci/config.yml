@@ -1,5 +1,9 @@
 version: 2.1
 
+default-context: &default-context
+  context:
+    - lychee-ci-environment
+
 orbs:
   redmine-plugin: agileware-jp/redmine-plugin@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.1.0
@@ -38,7 +42,7 @@ jobs: # Integration Testing jobs
     executor: orb-tools/ubuntu
     steps:
       - redmine-plugin/download-redmine:
-          version: latest
+          version_env: REDMINE_MAX_VERSION
       - run:
           name: Check if redmine exists
           command: test -f redmine/lib/redmine.rb
@@ -224,7 +228,8 @@ workflows:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
       - test-download-redmine
-      - test-download-redmine-latest
+      - test-download-redmine-latest:
+          <<: *default-context
       - test-download-redmine-trunk
       - test-download-redmica
       - test-download-redmica-latest
