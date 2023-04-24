@@ -1,9 +1,5 @@
 version: 2.1
 
-default-context: &default-context
-  context:
-    - lychee-ci-environment
-
 orbs:
   redmine-plugin: agileware-jp/redmine-plugin@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.1.0
@@ -229,7 +225,8 @@ workflows:
     jobs:
       - test-download-redmine
       - test-download-redmine-latest:
-          <<: *default-context
+          context:
+            - lychee-ci-environment
       - test-download-redmine-trunk
       - test-download-redmica
       - test-download-redmica-latest
