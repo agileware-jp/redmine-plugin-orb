@@ -10,7 +10,7 @@ parameters:
     type: string
     default: latest
   version_env:
-    description: Redmine version (via environment values)
+    description: Redmine version (via env values)
     type: env_var_name
     default: UNSPECIFIED
   destination:
