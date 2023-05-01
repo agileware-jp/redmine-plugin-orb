@@ -300,6 +300,8 @@ workflows:
             - test-download-redmine
             - test-download-redmine-latest
             - test-download-redmine-trunk
+            - test-download-redmine-supported-max-version
+            - test-download-redmine-supported-min-version
             - test-download-redmica
             - test-download-redmica-latest
             - test-install-plugin
