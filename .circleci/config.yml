@@ -164,7 +164,7 @@ jobs: # Integration Testing jobs
           command: test -f redmine/plugins/redmine-plugin-orb/src/@orb.yml
       - run:
           name: Check if Gemfile.local was copied
-          command: test -f redmine/Gemfile.local
+          command: diff -u redmine/plugins/redmine-plugin-orb/Gemfile.local redmine/Gemfile.local
   test-generate-database_yml:
     executor: redmine-plugin/ruby-mysql
     steps:
