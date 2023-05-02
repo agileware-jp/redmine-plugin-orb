@@ -34,6 +34,21 @@ steps:
           sed -e 's/^v//'
         }
 
+        extract_latest_tiny_redmine_version() {
+          curl -s https://api.github.com/repos/redmine/redmine/tags |
+          jq -r '.[].name' |
+          grep "^$1" |
+          head -n1
+        }
+
+        extract_latest_tiny_redmica_version() {
+          curl -s https://api.github.com/repos/redmica/redmica/tags |
+          jq -r '.[].name' |
+          sed -e 's/^v//' |
+          grep "^$1" |
+          head -n1
+        }
+
         version=<< parameters.version >>
         product=<< parameters.product >>
 
@@ -41,6 +56,8 @@ steps:
 
         if [ "$version" == "latest" ]; then
           "extract_latest_${product}_version" > .version
+        elif [ -z "$(echo $version | cut -d . -f 3)" ]; then
+          "extract_latest_tiny_${product}_version" "$version" > .version
         fi
 
         echo "Test product: << parameters.product >>@$(cat .version)"

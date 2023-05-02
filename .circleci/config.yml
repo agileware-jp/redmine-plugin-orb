@@ -93,6 +93,18 @@ jobs: # Integration Testing jobs
               egrep "MINOR.+${digits[1]}" redmine/lib/redmine/version.rb
               egrep "TINY.+${digits[2]}" redmine/lib/redmine/version.rb
             fi
+  test-download-redmine-latest-tiny-version:
+    executor: orb-tools/ubuntu
+    steps:
+      - redmine-plugin/download-redmine:
+          version: '4.1'
+      - run:
+          name: Check if redmine exists
+          command: test -f redmine/lib/redmine.rb
+      - run:
+          name: Check if there is a .version file containing latest version
+          command: |
+            test "$(cat redmine/.version)" = "4.1.7"
   test-download-redmica:
     executor: orb-tools/ubuntu
     steps:
@@ -131,6 +143,19 @@ jobs: # Integration Testing jobs
               jq -r '.[0].name' |
               sed -e 's/^v//'
             )
+  test-download-redmica-latest-tiny-version:
+    executor: orb-tools/ubuntu
+    steps:
+      - redmine-plugin/download-redmine:
+          product: 'redmica'
+          version: '2.1'
+      - run:
+          name: Check if redmine exists
+          command: test -f redmine/lib/redmine.rb
+      - run:
+          name: Check if there is a .version file containing latest version
+          command: |
+            test "$(cat redmine/.version)" = "2.1.1"
   test-download-redmine-trunk:
     docker:
       - image: circleci/buildpack-deps:stretch-scm
@@ -278,6 +303,7 @@ workflows:
     jobs:
       - test-download-redmine
       - test-download-redmine-latest
+      - test-download-redmine-latest-tiny-version
       - test-download-redmine-trunk
       - test-download-redmine-supported-max-version:
           context:
@@ -287,6 +313,7 @@ workflows:
             - lychee-ci-environment
       - test-download-redmica
       - test-download-redmica-latest
+      - test-download-redmica-latest-tiny-version
       - test-install-plugin
       - test-install-self
       - test-generate-database_yml
@@ -310,11 +337,13 @@ workflows:
           requires:
             - test-download-redmine
             - test-download-redmine-latest
+            - test-download-redmine-latest-tiny-version
             - test-download-redmine-trunk
             - test-download-redmine-supported-max-version
             - test-download-redmine-supported-min-version
             - test-download-redmica
             - test-download-redmica-latest
+            - test-download-redmica-latest-tiny-version
             - test-install-plugin
             - test-install-self
             - test-generate-database_yml
