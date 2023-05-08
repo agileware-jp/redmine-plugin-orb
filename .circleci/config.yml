@@ -164,7 +164,7 @@ jobs: # Integration Testing jobs
           command: test -f redmine/plugins/redmine-plugin-orb/src/@orb.yml
       - run:
           name: Check if Gemfile.local was copied
-          command: test -f redmine/Gemfile.local
+          command: diff -u redmine/plugins/redmine-plugin-orb/Gemfile.local redmine/Gemfile.local
   test-generate-database_yml:
     executor: redmine-plugin/ruby-mysql
     steps:
@@ -174,6 +174,19 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if the correct database.yml was created
           command: 'egrep "adapter: mysql2" redmine/config/database.yml'
+  test-bundle-install-without-Gemfile_local:
+    executor:
+      name: redmine-plugin/ruby-sqlite3
+      ruby_version: '2.6'
+    steps:
+      - checkout # To resolve ssh problems with git later
+      - redmine-plugin/download-redmine:
+          version: '4.1.5'
+      - redmine-plugin/generate-database_yml
+      - redmine-plugin/bundle-install
+      - run:
+          name: Check if Gemfile.local was created
+          command: test -f redmine/Gemfile.local
   test-bundle-install-and-rspec:
     executor:
       name: redmine-plugin/ruby-sqlite3
@@ -207,9 +220,6 @@ jobs: # Integration Testing jobs
           version: '4.1.7'
       - redmine-plugin/install-plugin:
           repository: https://github.com/Loriowar/redmine_issues_tree.git
-      - run:
-          name: Create Gemfile.local
-          command: touch redmine/Gemfile.local
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
       - redmine-plugin/test:
@@ -280,6 +290,7 @@ workflows:
       - test-install-plugin
       - test-install-self
       - test-generate-database_yml
+      - test-bundle-install-without-Gemfile_local
       - test-bundle-install-and-rspec
       - test-bundle-install-and-test
       - test-build-plugin-assets
@@ -300,11 +311,14 @@ workflows:
             - test-download-redmine
             - test-download-redmine-latest
             - test-download-redmine-trunk
+            - test-download-redmine-supported-max-version
+            - test-download-redmine-supported-min-version
             - test-download-redmica
             - test-download-redmica-latest
             - test-install-plugin
             - test-install-self
             - test-generate-database_yml
+            - test-bundle-install-without-Gemfile_local
             - test-bundle-install-and-rspec
             - test-bundle-install-and-test
             - test-build-plugin-assets

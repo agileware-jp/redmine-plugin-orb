@@ -15,6 +15,11 @@ steps:
       name: Check ruby version
       command: |
         ruby -v > /tmp/ruby-version
+  - run:
+      name: Touch Gemfile.local if not exists
+      command: |
+        f="<< parameters.redmine_root >>/Gemfile.local"
+        test -e "$f" || touch "$f"
   - restore_cache:
       keys:
         - '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile.local" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
