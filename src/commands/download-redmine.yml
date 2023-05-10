@@ -25,13 +25,28 @@ steps:
       command: |
         extract_latest_redmine_version() {
           curl -s https://api.github.com/repos/redmine/redmine/tags |
-          jq -r '.[0].name' > .version
+          jq -r '.[0].name'
         }
 
         extract_latest_redmica_version() {
           curl -s https://api.github.com/repos/redmica/redmica/tags |
           jq -r '.[0].name' |
-          sed -e 's/^v//' > .version
+          sed -e 's/^v//'
+        }
+
+        extract_latest_tiny_redmine_version() {
+          curl -s https://api.github.com/repos/redmine/redmine/tags |
+          jq -r '.[].name' |
+          grep "^$1" |
+          head -n1
+        }
+
+        extract_latest_tiny_redmica_version() {
+          curl -s https://api.github.com/repos/redmica/redmica/tags |
+          jq -r '.[].name' |
+          sed -e 's/^v//' |
+          grep "^$1" |
+          head -n1
         }
 
         version=<< parameters.version >>
@@ -40,11 +55,9 @@ steps:
         echo $version > .version
 
         if [ "$version" == "latest" ]; then
-          if [ "$product" == "redmine" ]; then
-            extract_latest_redmine_version
-          elif [ "$product" == "redmica" ]; then
-            extract_latest_redmica_version
-          fi
+          "extract_latest_${product}_version" > .version
+        elif [ -z "$(echo $version | cut -d . -f 3)" ]; then
+          "extract_latest_tiny_${product}_version" "$version" > .version
         fi
 
         echo "Test product: << parameters.product >>@$(cat .version)"
