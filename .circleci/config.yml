@@ -234,7 +234,7 @@ jobs: # Integration Testing jobs
           command: test -f /tmp/rspec/rspec.xml
       - run:
           name: Check if the coverage result file exists
-          command: test -f /tmp/coverage/index.html
+          command: test -f /coverage/redmine_issue_templates_spec/index.html
   test-bundle-install-and-test:
     executor:
       name: redmine-plugin/ruby-sqlite3
