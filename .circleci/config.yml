@@ -251,7 +251,7 @@ jobs: # Integration Testing jobs
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
       - redmine-plugin/test:
-          plugin: redmine_issues_tree
+          plugin: redmine_issue_templates
   test-build-plugin-assets:
     docker:
       - image: cimg/node:12.18.2
