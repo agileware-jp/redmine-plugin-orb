@@ -224,7 +224,7 @@ jobs: # Integration Testing jobs
           repository: git@github.com:agileware-jp/redmine_issue_templates.git
       - run:
           name: Copy Gemfile.local
-          command: cp redmine/plugins/redmine_github/Gemfile.local redmine/
+          command: cp redmine/plugins/redmine_issue_templates/Gemfile.local redmine/
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
       - redmine-plugin/rspec:
