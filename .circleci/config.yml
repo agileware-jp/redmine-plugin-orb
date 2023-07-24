@@ -230,6 +230,9 @@ jobs: # Integration Testing jobs
       - redmine-plugin/rspec:
           plugin: redmine_issue_templates
       - run:
+          name: Print current working directory
+          command: pwd
+      - run:
           name: Check if the test result file exists
           command: test -f /tmp/rspec/rspec.xml
       - run:
