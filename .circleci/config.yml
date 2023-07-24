@@ -202,11 +202,11 @@ jobs: # Integration Testing jobs
   test-bundle-install-without-Gemfile_local:
     executor:
       name: redmine-plugin/ruby-sqlite3
-      ruby_version: '2.6'
+      ruby_version: '$RUBY_MIN_VERSION'
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download-redmine:
-          version: '4.1.5'
+          version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
       - run:
@@ -215,11 +215,11 @@ jobs: # Integration Testing jobs
   test-bundle-install-and-rspec:
     executor:
       name: redmine-plugin/ruby-sqlite3
-      ruby_version: '2.6'
+      ruby_version: '$RUBY_MIN_VERSION'
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download-redmine:
-          version: '4.1.7'
+          version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/install-plugin:
           repository: git@github.com:agileware-jp/redmine_issue_templates.git
       - run:
@@ -238,11 +238,11 @@ jobs: # Integration Testing jobs
   test-bundle-install-and-test:
     executor:
       name: redmine-plugin/ruby-sqlite3
-      ruby_version: '2.6'
+      ruby_version: '$RUBY_MIN_VERSION'
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download-redmine:
-          version: '4.1.7'
+          version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/install-plugin:
           repository: git@github.com:agileware-jp/redmine_issue_templates.git
       - run:
@@ -320,9 +320,15 @@ workflows:
       - test-install-plugin
       - test-install-self
       - test-generate-database_yml
-      - test-bundle-install-without-Gemfile_local
-      - test-bundle-install-and-rspec
-      - test-bundle-install-and-test
+      - test-bundle-install-without-Gemfile_local:
+          context:
+            - lychee-ci-environment
+      - test-bundle-install-and-rspec:
+          context:
+            - lychee-ci-environment
+      - test-bundle-install-and-test:
+          context:
+            - lychee-ci-environment
       - test-build-plugin-assets
       - test-build-plugin-assets-with-docker
 
