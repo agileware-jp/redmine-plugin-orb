@@ -233,6 +233,9 @@ jobs: # Integration Testing jobs
           name: Print current working directory
           command: pwd
       - run:
+          name: List contents of the current directory
+          command: ls -la
+      - run:
           name: Check if the test result file exists
           command: test -f /tmp/rspec/rspec.xml
       - run:
