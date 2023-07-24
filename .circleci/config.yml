@@ -228,7 +228,7 @@ jobs: # Integration Testing jobs
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
       - redmine-plugin/rspec:
-          plugin: redmine_github
+          plugin: redmine_issue_templates
       - run:
           name: Check if the test result file exists
           command: test -f /tmp/rspec/rspec.xml
