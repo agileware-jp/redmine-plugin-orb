@@ -21,7 +21,7 @@ jobs: # Integration Testing jobs
     executor: orb-tools/ubuntu
     steps:
       - redmine-plugin/download-redmine:
-          version: '3.4.9'
+          version: '$REDMINE_MIN_VERSION'
       - run:
           name: Check if redmine exists
           command: test -f redmine/lib/redmine.rb
@@ -33,7 +33,7 @@ jobs: # Integration Testing jobs
             egrep "TINY.+9" redmine/lib/redmine/version.rb
       - run:
           name: Check if there is a .version file containing the specified version
-          command: test "`cat redmine/.version`" = "3.4.9"
+          command: test "`cat redmine/.version`" = "$REDMINE_MIN_VERSION"
   test-download-redmine-supported-min-version:
     executor: orb-tools/ubuntu
     steps:
@@ -97,14 +97,14 @@ jobs: # Integration Testing jobs
     executor: orb-tools/ubuntu
     steps:
       - redmine-plugin/download-redmine:
-          version: '4.1'
+          version: '$REDMINE_MIN_VERSION'
       - run:
           name: Check if redmine exists
           command: test -f redmine/lib/redmine.rb
       - run:
           name: Check if there is a .version file containing latest version
           command: |
-            test "$(cat redmine/.version)" = "4.1.7"
+            test "$(cat redmine/.version)" = "$REDMINE_MIN_VERSION"
   test-download-redmica:
     executor: orb-tools/ubuntu
     steps:
@@ -172,7 +172,7 @@ jobs: # Integration Testing jobs
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download-redmine:
-          version: '3.4.9'
+          version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/install-plugin:
           repository: git@github.com:agileware-jp/redmine_work_days.git
       - run:
@@ -182,7 +182,7 @@ jobs: # Integration Testing jobs
     executor: orb-tools/ubuntu
     steps:
       - redmine-plugin/download-redmine:
-          version: '3.4.9'
+          version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/install-self
       - run:
           name: Check if the repository was added to plugins
@@ -194,7 +194,7 @@ jobs: # Integration Testing jobs
     executor: redmine-plugin/ruby-mysql
     steps:
       - redmine-plugin/download-redmine:
-          version: '3.4.9'
+          version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/generate-database_yml
       - run:
           name: Check if the correct database.yml was created
@@ -304,9 +304,13 @@ workflows:
   test-and-release:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
-      - test-download-redmine
+      - test-download-redmine:
+          context:
+            - lychee-ci-environment
       - test-download-redmine-latest
-      - test-download-redmine-latest-tiny-version
+      - test-download-redmine-latest-tiny-version:
+          context:
+            - lychee-ci-environment
       - test-download-redmine-trunk
       - test-download-redmine-supported-max-version:
           context:
@@ -317,9 +321,15 @@ workflows:
       - test-download-redmica
       - test-download-redmica-latest
       - test-download-redmica-latest-tiny-version
-      - test-install-plugin
-      - test-install-self
-      - test-generate-database_yml
+      - test-install-plugin:
+          context:
+            - lychee-ci-environment
+      - test-install-self:
+          context:
+            - lychee-ci-environment
+      - test-generate-database_yml:
+          context:
+            - lychee-ci-environment
       - test-bundle-install-without-Gemfile_local:
           context:
             - lychee-ci-environment
