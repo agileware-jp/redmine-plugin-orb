@@ -34,11 +34,6 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if there is a .version file containing the specified version
           command: test "`cat redmine/.version`" = "3.4.9"
-      - run:
-          name: Install and set Chrome version
-          command: |
-            curl -sSL https://raw.githubusercontent.com/CircleCI-Public/browser-tools/v1.4.3/scripts/install-browser-tools | bash
-            circleci-browser install chrome 114.0.5735.90
   test-download-redmine-supported-min-version:
     executor: orb-tools/ubuntu
     steps:
