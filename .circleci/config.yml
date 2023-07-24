@@ -230,17 +230,14 @@ jobs: # Integration Testing jobs
       - redmine-plugin/rspec:
           plugin: redmine_issue_templates
       - run:
-          name: Change directory to redmine directory
-          command: cd redmine
-      - run:
-          name: List contents of the current directory
-          command: ls -la
+          name: Print current working directory
+          command: pwd
       - run:
           name: Check if the test result file exists
           command: test -f /tmp/rspec/rspec.xml
       - run:
           name: Check if the coverage result file exists
-          command: test -f /redmine/coverage/redmine_issue_templates_spec/index.html
+          command: test -f project/redmine/coverage/redmine_issue_templates_spec/index.html
   test-bundle-install-and-test:
     executor:
       name: redmine-plugin/ruby-sqlite3
