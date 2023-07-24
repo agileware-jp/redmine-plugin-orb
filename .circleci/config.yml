@@ -16,6 +16,10 @@ parameters:
     type: string
     default: "dev:alpha"
 
+common_environment: &common_environment
+  context:
+    - lychee-ci-environment
+
 jobs: # Integration Testing jobs
   test-download-redmine:
     executor: orb-tools/ubuntu
@@ -305,40 +309,30 @@ workflows:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
       - test-download-redmine:
-          context:
-            - lychee-ci-environment
+          <<: *common_environment
       - test-download-redmine-latest
       - test-download-redmine-latest-tiny-version:
-          context:
-            - lychee-ci-environment
+          <<: *common_environment
       - test-download-redmine-trunk
       - test-download-redmine-supported-max-version:
-          context:
-            - lychee-ci-environment
+          <<: *common_environment
       - test-download-redmine-supported-min-version:
-          context:
-            - lychee-ci-environment
+          <<: *common_environment
       - test-download-redmica
       - test-download-redmica-latest
       - test-download-redmica-latest-tiny-version
       - test-install-plugin:
-          context:
-            - lychee-ci-environment
+          <<: *common_environment
       - test-install-self:
-          context:
-            - lychee-ci-environment
+          <<: *common_environment
       - test-generate-database_yml:
-          context:
-            - lychee-ci-environment
+          <<: *common_environment
       - test-bundle-install-without-Gemfile_local:
-          context:
-            - lychee-ci-environment
+          <<: *common_environment
       - test-bundle-install-and-rspec:
-          context:
-            - lychee-ci-environment
+          <<: *common_environment
       - test-bundle-install-and-test:
-          context:
-            - lychee-ci-environment
+          <<: *common_environment
       - test-build-plugin-assets
       - test-build-plugin-assets-with-docker
 
