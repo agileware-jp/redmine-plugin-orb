@@ -3,7 +3,7 @@ version: 2.1
 orbs:
   redmine-plugin: agileware-jp/redmine-plugin@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.1.0
-  browser-tools: circleci/browser-tools@1.4.0
+  browser-tools: circleci/browser-tools@1.4.3
 
 # Pipeline parameters
 parameters:
@@ -16,24 +16,28 @@ parameters:
     type: string
     default: "dev:alpha"
 
+common_environment: &common_environment
+  context:
+    - lychee-ci-environment
+
 jobs: # Integration Testing jobs
   test-download-redmine:
     executor: orb-tools/ubuntu
     steps:
       - redmine-plugin/download-redmine:
-          version: '3.4.9'
+          version: '$REDMINE_MIN_VERSION'
       - run:
           name: Check if redmine exists
           command: test -f redmine/lib/redmine.rb
       - run:
           name: Check if redmine has the downloaded version
           command: |
-            egrep "MAJOR.+3" redmine/lib/redmine/version.rb
-            egrep "MINOR.+4" redmine/lib/redmine/version.rb
-            egrep "TINY.+9" redmine/lib/redmine/version.rb
+            egrep "MAJOR.+4" redmine/lib/redmine/version.rb
+            egrep "MINOR.+1" redmine/lib/redmine/version.rb
+            egrep "TINY.+7" redmine/lib/redmine/version.rb
       - run:
           name: Check if there is a .version file containing the specified version
-          command: test "`cat redmine/.version`" = "3.4.9"
+          command: test "`cat redmine/.version`" = "$REDMINE_MIN_VERSION"
   test-download-redmine-supported-min-version:
     executor: orb-tools/ubuntu
     steps:
@@ -97,14 +101,14 @@ jobs: # Integration Testing jobs
     executor: orb-tools/ubuntu
     steps:
       - redmine-plugin/download-redmine:
-          version: '4.1'
+          version: '$REDMINE_MIN_VERSION'
       - run:
           name: Check if redmine exists
           command: test -f redmine/lib/redmine.rb
       - run:
           name: Check if there is a .version file containing latest version
           command: |
-            test "$(cat redmine/.version)" = "4.1.7"
+            test "$(cat redmine/.version)" = "$REDMINE_MIN_VERSION"
   test-download-redmica:
     executor: orb-tools/ubuntu
     steps:
@@ -172,7 +176,7 @@ jobs: # Integration Testing jobs
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download-redmine:
-          version: '3.4.9'
+          version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/install-plugin:
           repository: git@github.com:agileware-jp/redmine_work_days.git
       - run:
@@ -182,7 +186,7 @@ jobs: # Integration Testing jobs
     executor: orb-tools/ubuntu
     steps:
       - redmine-plugin/download-redmine:
-          version: '3.4.9'
+          version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/install-self
       - run:
           name: Check if the repository was added to plugins
@@ -194,7 +198,7 @@ jobs: # Integration Testing jobs
     executor: redmine-plugin/ruby-mysql
     steps:
       - redmine-plugin/download-redmine:
-          version: '3.4.9'
+          version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/generate-database_yml
       - run:
           name: Check if the correct database.yml was created
@@ -202,11 +206,11 @@ jobs: # Integration Testing jobs
   test-bundle-install-without-Gemfile_local:
     executor:
       name: redmine-plugin/ruby-sqlite3
-      ruby_version: '2.6'
+      ruby_version: '$RUBY_MIN_VERSION'
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download-redmine:
-          version: '4.1.5'
+          version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
       - run:
@@ -215,40 +219,43 @@ jobs: # Integration Testing jobs
   test-bundle-install-and-rspec:
     executor:
       name: redmine-plugin/ruby-sqlite3
-      ruby_version: '2.6'
+      ruby_version: '$RUBY_MIN_VERSION'
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download-redmine:
-          version: '4.1.5'
+          version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/install-plugin:
-          repository: git@github.com:agileware-jp/redmine_github.git
+          repository: git@github.com:agileware-jp/redmine_issue_templates.git
       - run:
           name: Copy Gemfile.local
-          command: cp redmine/plugins/redmine_github/Gemfile.local redmine/
+          command: cp redmine/plugins/redmine_issue_templates/Gemfile.local redmine/
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
       - redmine-plugin/rspec:
-          plugin: redmine_github
+          plugin: redmine_issue_templates
       - run:
           name: Check if the test result file exists
           command: test -f /tmp/rspec/rspec.xml
       - run:
           name: Check if the coverage result file exists
-          command: test -f /tmp/coverage/index.html
+          command: test -f redmine/coverage/redmine_issue_templates_spec/index.html
   test-bundle-install-and-test:
     executor:
       name: redmine-plugin/ruby-sqlite3
-      ruby_version: '2.5'
+      ruby_version: '$RUBY_MIN_VERSION'
     steps:
       - checkout # To resolve ssh problems with git later
       - redmine-plugin/download-redmine:
-          version: '4.1.7'
+          version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/install-plugin:
-          repository: https://github.com/Loriowar/redmine_issues_tree.git
+          repository: git@github.com:agileware-jp/redmine_issue_templates.git
+      - run:
+          name: Copy Gemfile.local
+          command: cp redmine/plugins/redmine_issue_templates/Gemfile.local redmine/
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
       - redmine-plugin/test:
-          plugin: redmine_issues_tree
+          plugin: redmine_issue_templates
   test-build-plugin-assets:
     docker:
       - image: cimg/node:12.18.2
@@ -301,25 +308,31 @@ workflows:
   test-and-release:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
-      - test-download-redmine
+      - test-download-redmine:
+          <<: *common_environment
       - test-download-redmine-latest
-      - test-download-redmine-latest-tiny-version
+      - test-download-redmine-latest-tiny-version:
+          <<: *common_environment
       - test-download-redmine-trunk
       - test-download-redmine-supported-max-version:
-          context:
-            - lychee-ci-environment
+          <<: *common_environment
       - test-download-redmine-supported-min-version:
-          context:
-            - lychee-ci-environment
+          <<: *common_environment
       - test-download-redmica
       - test-download-redmica-latest
       - test-download-redmica-latest-tiny-version
-      - test-install-plugin
-      - test-install-self
-      - test-generate-database_yml
-      - test-bundle-install-without-Gemfile_local
-      - test-bundle-install-and-rspec
-      - test-bundle-install-and-test
+      - test-install-plugin:
+          <<: *common_environment
+      - test-install-self:
+          <<: *common_environment
+      - test-generate-database_yml:
+          <<: *common_environment
+      - test-bundle-install-without-Gemfile_local:
+          <<: *common_environment
+      - test-bundle-install-and-rspec:
+          <<: *common_environment
+      - test-bundle-install-and-test:
+          <<: *common_environment
       - test-build-plugin-assets
       - test-build-plugin-assets-with-docker
 
