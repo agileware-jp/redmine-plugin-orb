@@ -9,6 +9,10 @@ parameters:
     description: Directory where redmine is installed
     type: string
     default: redmine
+  update_packages:
+    description: Package names for updating
+    type: string
+    default: ''
 
 steps:
   - run:
@@ -35,6 +39,13 @@ steps:
       name: Execute bundle install
       working_directory: '<< parameters.redmine_root >>'
       command: bundle check --path vendor/bundle || bundle install --path vendor/bundle
+  - when:
+      condition: << parameters.update_packages >>
+      steps:
+        - run:
+            name: Execute bundle update if update_packages was given
+            working_directory: '<< parameters.redmine_root >>'
+            command: bundle update << parameters.update_packages >>
   - save_cache:
       key: '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile.local" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
       paths:
