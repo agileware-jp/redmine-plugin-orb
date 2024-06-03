@@ -29,7 +29,7 @@ parameters:
     default: ''
   chrome_version:
     type: string
-    default: '114.0.5735.133'
+    default: '123.0.6312.86'
 
 steps:
   - run: sudo apt-get update
