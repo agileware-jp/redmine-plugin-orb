@@ -3,7 +3,7 @@ version: 2.1
 orbs:
   redmine-plugin: agileware-jp/redmine-plugin@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.1.0
-  browser-tools: circleci/browser-tools@1.4.6
+  browser-tools: circleci/browser-tools@1.4.8
 
 # Pipeline parameters
 parameters:
@@ -14,7 +14,7 @@ parameters:
     default: false
   dev-orb-version:
     type: string
-    default: "dev:alpha"
+    default: 'dev:alpha'
 
 common_environment: &common_environment
   context:
@@ -284,7 +284,6 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if the built file exists
           command: test -f ~/project/assets/test.js
-
 
 workflows:
   lint-pack-validate-start-tests:
