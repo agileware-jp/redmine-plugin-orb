@@ -230,6 +230,14 @@ jobs: # Integration Testing jobs
           name: Copy Gemfile.local
           command: cp redmine/plugins/redmine_issue_templates/Gemfile.local redmine/
       - redmine-plugin/generate-database_yml
+      # NOTE: For Redmine v4.2, it is necessary to upgrade the version of selenium-webdriver to avoid the error:
+      #       "NameError: uninitialized constant Selenium::WebDriver::Chrome::Options".
+      #       This command updates the version of selenium-webdriver in the Gemfile to 3.4.0 or later.
+      - run:
+          name: Update selenium-webdriver version in Gemfile
+          working_directory: redmine
+          command: |
+            sed -i 's/gem "selenium-webdriver".*/gem "selenium-webdriver", ">= 3.4.0"/' Gemfile
       - redmine-plugin/bundle-install
       - redmine-plugin/rspec:
           plugin: redmine_issue_templates
