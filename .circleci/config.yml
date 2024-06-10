@@ -237,7 +237,18 @@ jobs: # Integration Testing jobs
           name: Update selenium-webdriver version in Gemfile
           working_directory: redmine
           command: |
-            sed -i 's/gem "selenium-webdriver".*/gem "selenium-webdriver", ">= 3.4.0"/' Gemfile
+            VERSION=$(grep "selenium-webdriver" Gemfile | grep -o '[0-9]*\.[0-9]*\.[0-9]*' | head -n 1 || true)
+            if [ -z "${VERSION}" ]; then
+              echo "selenium-webdriver version not found in Gemfile. updated to >= 3.4.0."
+              sed -i 's/gem "selenium-webdriver".*/gem "selenium-webdriver", ">= 3.4.0"/' Gemfile
+            else
+              if [ "${VERSION:0:1}" = "3" ] && [ "${VERSION:2:1}" -le 4 ]; then
+                echo "selenium-webdriver version updated to >= 3.4.0 in Gemfile."
+                sed -i 's/gem "selenium-webdriver".*/gem "selenium-webdriver", ">= 3.4.0"/' Gemfile
+              else
+                echo "No update needed for selenium-webdriver version in Gemfile."
+              fi
+            fi
       - redmine-plugin/bundle-install
       - redmine-plugin/rspec:
           plugin: redmine_issue_templates
