@@ -36,6 +36,15 @@ steps:
           sudo apt-get install -y libsqlite3-dev
         fi
   - run:
+      name: Add missing gems
+      working_directory: '<< parameters.redmine_root >>'
+      command: |
+        # https://www.redmine.org/issues/40802
+        if grep -q "require 'blankslate'" lib/redmine/views/builders/structure.rb
+        then
+          echo 'gem "blankslate"' >> Gemfile
+        fi
+  - run:
       name: Execute bundle install
       working_directory: '<< parameters.redmine_root >>'
       command: bundle check --path vendor/bundle || bundle install --path vendor/bundle
