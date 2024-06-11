@@ -27,17 +27,13 @@ parameters:
     description: Plugin name. If unspecified it will be the current repository's plugin.
     type: string
     default: ''
-  chrome_version:
-    type: string
-    default: '114.0.5735.198'
 
 steps:
   - run: sudo apt-get update
   - run:
       name: Uninstall pre-installed Chrome
       command: sudo dpkg --purge google-chrome-stable
-  - browser-tools/install-chrome:
-      chrome-version: '<< parameters.chrome_version >>'
+  - browser-tools/install-chrome
   - browser-tools/install-chromedriver
   - run:
       name: Setup Database
