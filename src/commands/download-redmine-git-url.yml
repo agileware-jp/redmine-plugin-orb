@@ -1,0 +1,28 @@
+description: Download Redmine trunk
+
+parameters:
+  git_url:
+    description: Redmine Git URL
+    type: string
+    default: https://github.com/redmine/redmine.git
+  version:
+    description: Redmine version
+    type: string
+    default: master
+  destination:
+    description: Destination path
+    type: string
+    default: redmine
+
+steps:
+  - run:
+      name: Clone Redmine
+      command: |
+        set -eux
+        git clone --filter=tree:0 "<< parameters.git_url >>" redmine-cloned
+        cd redmine-cloned
+        git checkout "<< parameters.version >>"
+        git rev-parse HEAD | tee .redmine-commit-id
+  - run:
+      name: Move Redmine to << parameters.destination >>
+      command: mv redmine-cloned "<< parameters.destination >>"
