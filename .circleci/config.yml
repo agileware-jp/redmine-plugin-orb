@@ -25,7 +25,7 @@ jobs: # Integration Testing jobs
     executor: orb-tools/ubuntu
     steps:
       - redmine-plugin/download-redmine:
-          version: '$REDMINE_MIN_VERSION'
+          version: '4.1.7'
       - run:
           name: Check if redmine exists
           command: test -f redmine/lib/redmine.rb
@@ -35,9 +35,12 @@ jobs: # Integration Testing jobs
             egrep "MAJOR.+4" redmine/lib/redmine/version.rb
             egrep "MINOR.+1" redmine/lib/redmine/version.rb
             egrep "TINY.+7" redmine/lib/redmine/version.rb
+      - redmine-plugin/download-redmine:
+          destination: 'redmine-min'
+          version: '$REDMINE_MIN_VERSION'
       - run:
           name: Check if there is a .version file containing the specified version
-          command: test "`cat redmine/.version`" = "$REDMINE_MIN_VERSION"
+          command: test "`cat redmine-min/.version`" = "$REDMINE_MIN_VERSION"
   test-download-redmine-supported-min-version:
     executor: orb-tools/ubuntu
     steps:
