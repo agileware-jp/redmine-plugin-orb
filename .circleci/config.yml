@@ -228,10 +228,10 @@ jobs: # Integration Testing jobs
       - redmine-plugin/download-redmine:
           version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/install-plugin:
-          repository: git@github.com:agileware-jp/redmine_issue_templates.git
+          repository: git@github.com:agileware-jp/redmine_issue_trash.git
       - run:
           name: Copy Gemfile.local
-          command: cp redmine/plugins/redmine_issue_templates/Gemfile.local redmine/
+          command: cp redmine/plugins/redmine_issue_trash/Gemfile.local redmine/
       - redmine-plugin/generate-database_yml
       # NOTE: For Redmine v4.2, it is necessary to upgrade the version of selenium-webdriver to avoid the error:
       #       "NameError: uninitialized constant Selenium::WebDriver::Chrome::Options".
@@ -254,13 +254,13 @@ jobs: # Integration Testing jobs
             fi
       - redmine-plugin/bundle-install
       - redmine-plugin/rspec:
-          plugin: redmine_issue_templates
+          plugin: redmine_issue_trash
       - run:
           name: Check if the test result file exists
           command: test -f /tmp/rspec/rspec.xml
       - run:
           name: Check if the coverage result file exists
-          command: test -f redmine/coverage/redmine_issue_templates_spec/index.html
+          command: test -f /tmp/coverage/index.html
   test-bundle-install-and-test:
     executor:
       name: redmine-plugin/ruby-sqlite3
@@ -270,14 +270,14 @@ jobs: # Integration Testing jobs
       - redmine-plugin/download-redmine:
           version: '$REDMINE_MIN_VERSION'
       - redmine-plugin/install-plugin:
-          repository: git@github.com:agileware-jp/redmine_issue_templates.git
+          repository: git@github.com:agileware-jp/redmine_issue_trash.git
       - run:
           name: Copy Gemfile.local
-          command: cp redmine/plugins/redmine_issue_templates/Gemfile.local redmine/
+          command: cp redmine/plugins/redmine_issue_trash/Gemfile.local redmine/
       - redmine-plugin/generate-database_yml
       - redmine-plugin/bundle-install
       - redmine-plugin/test:
-          plugin: redmine_issue_templates
+          plugin: redmine_issue_trash
   test-build-plugin-assets:
     docker:
       - image: cimg/node:12.18.2
