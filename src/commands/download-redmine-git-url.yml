@@ -1,8 +1,8 @@
-description: Download Redmine trunk
+description: Download Redmine from Git repository
 
 parameters:
   git_url:
-    description: Redmine Git URL
+    description: Redmine Git repository URL
     type: string
     default: https://github.com/redmine/redmine.git
   version:
