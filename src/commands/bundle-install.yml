@@ -28,6 +28,11 @@ steps:
       keys:
         - '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile.local" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
   - run:
+      name: key installation for chrome gpg key
+      command: |
+        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo tee /etc/apt/trusted.gpg.d/google.asc >/dev/null
+        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/google.gpg >/dev/null
+  - run:
       name: Install related packages
       command: |
         sudo apt-get update
