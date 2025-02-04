@@ -140,7 +140,7 @@ jobs: # Integration Testing jobs
           destination: 'wrk'
       - run:
           name: Check if redmica exists
-          command: egrep "module\s+RedMica" wrk/lib/redmine/version.rb
+          command: egrep "module\s+RedMica" wrk/lib/redmica/version.rb
       - run:
           name: Check if there is a .version file containing latest version
           command: |
