@@ -18,31 +18,44 @@ parameters:
     type: enum
     enum: ["redmine", "redmica"]
     default: "redmine"
+  github_token:
+    description: token to use GitHub REST API
+    type: string
+    default: public_access
 
 steps:
   - run:
       name: Determine Redmine/Redmica version
       command: |
+        run_curl() {
+          local token="<< parameters.github_token >>"
+          if test "x$token" = xpublic_access; then
+            curl -s "$@"
+          else
+            curl -s --header "Authorization: Bearer $token" "$@"
+          fi
+        }
+
         extract_latest_redmine_version() {
-          curl -s https://api.github.com/repos/redmine/redmine/tags |
+          run_curl https://api.github.com/repos/redmine/redmine/tags |
           jq -r '.[0].name'
         }
 
         extract_latest_redmica_version() {
-          curl -s https://api.github.com/repos/redmica/redmica/tags |
+          run_curl https://api.github.com/repos/redmica/redmica/tags |
           jq -r '.[0].name' |
           sed -e 's/^v//'
         }
 
         extract_latest_tiny_redmine_version() {
-          curl -s https://api.github.com/repos/redmine/redmine/tags |
+          run_curl https://api.github.com/repos/redmine/redmine/tags |
           jq -r '.[].name' |
           grep "^$1" |
           head -n1
         }
 
         extract_latest_tiny_redmica_version() {
-          curl -s https://api.github.com/repos/redmica/redmica/tags |
+          run_curl https://api.github.com/repos/redmica/redmica/tags |
           jq -r '.[].name' |
           sed -e 's/^v//' |
           grep "^$1" |
