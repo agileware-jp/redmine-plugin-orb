@@ -19,7 +19,7 @@ parameters:
     enum: ["redmine", "redmica"]
     default: "redmine"
   github_token:
-    description: token to use GitHub REST API
+    description: Deprecated. No longer needed as we use git ls-remote instead of GitHub API
     type: string
     default: public_access
 
@@ -27,39 +27,40 @@ steps:
   - run:
       name: Determine Redmine/Redmica version
       command: |
-        run_curl() {
-          local token="<< parameters.github_token >>"
-          if test "x$token" = xpublic_access; then
-            curl -s "$@"
-          else
-            curl -s --header "Authorization: Bearer $token" "$@"
-          fi
-        }
-
         extract_latest_redmine_version() {
-          run_curl https://api.github.com/repos/redmine/redmine/tags |
-          jq -r '.[0].name'
+          git ls-remote --tags https://github.com/redmine/redmine.git |
+          awk '{print $2}' |
+          sed -E 's#refs/tags/##' |
+          sort -V |
+          tail -1
         }
 
         extract_latest_redmica_version() {
-          run_curl https://api.github.com/repos/redmica/redmica/tags |
-          jq -r '.[0].name' |
-          sed -e 's/^v//'
+          git ls-remote --tags https://github.com/redmica/redmica.git |
+          awk '{print $2}' |
+          sed -E 's#refs/tags/##' |
+          sed -e 's/^v//' |
+          sort -V |
+          tail -1
         }
 
         extract_latest_tiny_redmine_version() {
-          run_curl https://api.github.com/repos/redmine/redmine/tags |
-          jq -r '.[].name' |
+          git ls-remote --tags https://github.com/redmine/redmine.git |
+          awk '{print $2}' |
+          sed -E 's#refs/tags/##' |
           grep "^$1" |
-          head -n1
+          sort -V |
+          tail -1
         }
 
         extract_latest_tiny_redmica_version() {
-          run_curl https://api.github.com/repos/redmica/redmica/tags |
-          jq -r '.[].name' |
+          git ls-remote --tags https://github.com/redmica/redmica.git |
+          awk '{print $2}' |
+          sed -E 's#refs/tags/##' |
           sed -e 's/^v//' |
           grep "^$1" |
-          head -n1
+          sort -V |
+          tail -1
         }
 
         version=<< parameters.version >>

@@ -72,8 +72,11 @@ jobs: # Integration Testing jobs
           command: |
             cat redmine/.version
             test $(cat redmine/.version) = $(
-              curl -s https://api.github.com/repos/redmine/redmine/tags |
-              jq -r '.[0].name'
+              git ls-remote --tags https://github.com/redmine/redmine.git |
+              awk '{print $2}' |
+              sed -E 's#refs/tags/##' |
+              sort -V |
+              tail -1
             )
   test-download-redmine-supported-max-version:
     executor: orb-tools/ubuntu
@@ -91,8 +94,11 @@ jobs: # Integration Testing jobs
             if [ "$version" == "latest" ]; then
               cat redmine/.version
               test $(cat redmine/.version) = $(
-                curl -s https://api.github.com/repos/redmine/redmine/tags |
-                jq -r '.[0].name'
+                git ls-remote --tags https://github.com/redmine/redmine.git |
+                awk '{print $2}' |
+                sed -E 's#refs/tags/##' |
+                sort -V |
+                tail -1
               )
             else
               IFS='.' read -ra digits < <(echo "$version")
@@ -146,9 +152,12 @@ jobs: # Integration Testing jobs
           command: |
             cat wrk/.version
             test $(cat wrk/.version) = $(
-              curl -s https://api.github.com/repos/redmica/redmica/tags |
-              jq -r '.[0].name' |
-              sed -e 's/^v//'
+              git ls-remote --tags https://github.com/redmica/redmica.git |
+              awk '{print $2}' |
+              sed -E 's#refs/tags/##' |
+              sed -e 's/^v//' |
+              sort -V |
+              tail -1
             )
   test-download-redmica-latest-tiny-version:
     executor: orb-tools/ubuntu
