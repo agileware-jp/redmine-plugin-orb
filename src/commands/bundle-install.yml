@@ -54,7 +54,8 @@ steps:
       working_directory: '<< parameters.redmine_root >>'
       command: |
         set -eux -o pipefail
-        bundle config set --local path vendor/bundle
+        # .bundle is in https://github.com/redmine/redmine/blob/6.1.0/.gitignore#L43
+        bundle config set --local path .bundle
         bundle install
   - when:
       condition: << parameters.update_packages >>
@@ -66,5 +67,5 @@ steps:
   - save_cache:
       key: '<< parameters.cache_key_prefix >>{{ checksum "/tmp/ruby-version" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile" }}-{{ checksum "<< parameters.redmine_root >>/Gemfile.local" }}-{{ checksum "<< parameters.redmine_root >>/config/database.yml" }}'
       paths:
-        - << parameters.redmine_root >>/vendor/bundle
+        - << parameters.redmine_root >>/.bundle
         - << parameters.redmine_root >>/Gemfile.lock
