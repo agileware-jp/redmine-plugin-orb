@@ -52,7 +52,10 @@ steps:
   - run:
       name: Execute bundle install
       working_directory: '<< parameters.redmine_root >>'
-      command: bundle check --path vendor/bundle || bundle install --path vendor/bundle
+      command: |
+        set -eux -o pipefail
+        bundle config set --local path vendor/bundle
+        bundle install
   - when:
       condition: << parameters.update_packages >>
       steps:
