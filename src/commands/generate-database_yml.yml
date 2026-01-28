@@ -17,6 +17,7 @@ steps:
             adapter: mysql2
             database: circle_test
             host: 127.0.0.1
+            pool: 20
             username: root
             password:
             encoding: utf8mb4
@@ -28,6 +29,7 @@ steps:
             adapter: postgresql
             database: circle_test
             host: 127.0.0.1
+            pool: 20
             username: postgres
             password: postgres
         EOF
@@ -37,5 +39,6 @@ steps:
           test:
             adapter: sqlite3
             database: db/test.sqlite3
+            pool: 20
         EOF
         fi
