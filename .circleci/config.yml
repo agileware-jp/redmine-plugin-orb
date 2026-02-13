@@ -40,7 +40,7 @@ jobs: # Integration Testing jobs
           version: '$REDMINE_MIN_VERSION'
       - run:
           name: Check if there is a .version file containing the specified version
-          command: test "`cat redmine-min/.version`" = "$REDMINE_MIN_VERSION"
+          command: '[[ "`cat redmine-min/.version`" == "$REDMINE_MIN_VERSION"* ]]'
   test-download-redmine-supported-min-version:
     executor: orb-tools/ubuntu
     steps:
@@ -58,7 +58,7 @@ jobs: # Integration Testing jobs
             egrep "TINY.+${digits[2]}" redmine/lib/redmine/version.rb
       - run:
           name: Check if there is a .version file containing the specified version
-          command: test "`cat redmine/.version`" = "$REDMINE_MIN_VERSION"
+          command: '[[ "`cat redmine/.version`" == "$REDMINE_MIN_VERSION"* ]]'
   test-download-redmine-latest:
     executor: orb-tools/ubuntu
     steps:
@@ -110,8 +110,7 @@ jobs: # Integration Testing jobs
           command: test -f redmine/lib/redmine.rb
       - run:
           name: Check if there is a .version file containing latest version
-          command: |
-            test "$(cat redmine/.version)" = "$REDMINE_MIN_VERSION"
+          command: '[[ "`cat redmine/.version`" == "$REDMINE_MIN_VERSION"* ]]'
   test-download-redmica:
     executor: orb-tools/ubuntu
     steps:
@@ -155,14 +154,14 @@ jobs: # Integration Testing jobs
     steps:
       - redmine-plugin/download-redmine:
           product: 'redmica'
-          version: '2.1'
+          version: '3.0'
       - run:
           name: Check if redmine exists
           command: test -f redmine/lib/redmine.rb
       - run:
           name: Check if there is a .version file containing latest version
           command: |
-            test "$(cat redmine/.version)" = "2.1.1"
+            test "$(cat redmine/.version)" = "3.0.4"
   test-download-redmine-trunk:
     docker:
       - image: circleci/buildpack-deps:stretch-scm
