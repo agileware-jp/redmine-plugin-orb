@@ -36,26 +36,30 @@ steps:
           fi
         }
 
+        # tags API はデフォルトで最新30件しか返さない。特定マイナー版 (例 5.0) の
+        # 最新パッチを探す tiny 系では、新しいメジャー/マイナーのタグが増えると
+        # 目的の版が1ページ目からこぼれて grep 空振り → exit 1 になる。
+        # 取りこぼしを防ぐため per_page=100 で取得する。
         extract_latest_redmine_version() {
-          run_curl https://api.github.com/repos/redmine/redmine/tags |
+          run_curl 'https://api.github.com/repos/redmine/redmine/tags?per_page=100' |
           jq -r '.[0].name'
         }
 
         extract_latest_redmica_version() {
-          run_curl https://api.github.com/repos/redmica/redmica/tags |
+          run_curl 'https://api.github.com/repos/redmica/redmica/tags?per_page=100' |
           jq -r '.[0].name' |
           sed -e 's/^v//'
         }
 
         extract_latest_tiny_redmine_version() {
-          run_curl https://api.github.com/repos/redmine/redmine/tags |
+          run_curl 'https://api.github.com/repos/redmine/redmine/tags?per_page=100' |
           jq -r '.[].name' |
           grep "^$1" |
           head -n1
         }
 
         extract_latest_tiny_redmica_version() {
-          run_curl https://api.github.com/repos/redmica/redmica/tags |
+          run_curl 'https://api.github.com/repos/redmica/redmica/tags?per_page=100' |
           jq -r '.[].name' |
           sed -e 's/^v//' |
           grep "^$1" |
