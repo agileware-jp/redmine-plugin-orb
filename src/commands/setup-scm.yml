@@ -1,0 +1,56 @@
+description: Prepare Git and Subversion for plugin tests without SCM stubs
+
+parameters:
+  redmine_root:
+    description: Directory where Redmine is installed
+    type: string
+    default: redmine
+
+steps:
+  - run:
+      name: Install Git and Subversion clients
+      command: |
+        if ! command -v git >/dev/null || ! command -v svn >/dev/null; then
+          sudo apt-get update
+          sudo apt-get install -y git subversion
+        fi
+        git --version
+        svn --version --quiet
+  - run:
+      name: Configure test repository paths
+      working_directory: '<< parameters.redmine_root >>'
+      command: |
+        ruby \<<'RUBY'
+        require 'tmpdir'
+        require 'yaml'
+
+        path = 'config/configuration.yml'
+        configuration = if File.exist?(path)
+          source = File.read(path)
+          if source.include?('<%')
+            abort 'Configure SCM manually and use setup_scm: false for ERB configuration'
+          end
+          YAML.safe_load(source, permitted_classes: [Symbol], aliases: true) || {}
+        else
+          {}
+        end
+        raise 'configuration.yml must contain a mapping' unless configuration.is_a?(Hash)
+
+        defaults = configuration.fetch('default', {}) || {}
+        settings = configuration['test'] ||= {}
+        roots = [Dir.tmpdir, File.join(Dir.pwd, 'tmp')].uniq.map { |root| Regexp.escape(root) }
+        regexp = "(?:file://)?(?:#{roots.join('|')})(?:/.*)?"
+        %w[scm_git_path_regexp scm_subversion_path_regexp].each do |key|
+          settings[key] = regexp unless settings.key?(key) || defaults.key?(key)
+        end
+        File.write(path, YAML.dump(configuration))
+        RUBY
+  - run:
+      name: Enable and verify test SCM adapters
+      working_directory: '<< parameters.redmine_root >>'
+      command: |
+        RAILS_ENV=test bundle exec rails runner - \<<'RUBY'
+        Setting.enabled_scm = (Array(Setting[:enabled_scm]) + %w[Git Subversion]).uniq
+        missing = %w[Git Subversion] - Setting.enabled_scm
+        abort "Unavailable test SCM adapters: #{missing.join(', ')}" unless missing.empty?
+        RUBY

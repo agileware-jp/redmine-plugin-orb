@@ -21,6 +21,33 @@ common_environment: &common_environment
     - lychee-ci-environment
 
 jobs: # Integration Testing jobs
+  test-setup-scm:
+    parameters:
+      redmine_version:
+        type: string
+      ruby_version:
+        type: string
+    executor:
+      name: redmine-plugin/ruby-sqlite3
+      ruby_version: << parameters.ruby_version >>
+    steps:
+      - redmine-plugin/download-redmine-git-url:
+          version: << parameters.redmine_version >>
+      - redmine-plugin/generate-database_yml
+      - redmine-plugin/bundle-install
+      - run:
+          name: Prepare test database
+          working_directory: redmine
+          command: RAILS_ENV=test bundle exec rake db:create db:migrate
+      - redmine-plugin/setup-scm
+      - run:
+          name: Verify enabled SCM adapters
+          working_directory: redmine
+          command: |
+            RAILS_ENV=test bundle exec rails runner - \<<'RUBY'
+            enabled_scm = Setting.enabled_scm
+            raise "Unexpected enabled SCM adapters: #{enabled_scm.inspect}" unless (%w[Git Subversion] - enabled_scm).empty?
+            RUBY
   test-download-redmine:
     executor: orb-tools/ubuntu
     steps:
@@ -340,6 +367,14 @@ workflows:
   test-and-release:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
+      - test-setup-scm:
+          name: test-setup-scm-git
+          redmine_version: master
+          ruby_version: '4.0'
+      - test-setup-scm:
+          name: test-setup-scm-5.1
+          redmine_version: '5.1.13'
+          ruby_version: '3.1'
       - test-download-redmine:
           <<: *common_environment
       - test-download-redmine-latest
@@ -381,6 +416,8 @@ workflows:
           orb-name: agileware-jp/redmine-plugin
           publish-version-tag: false
           requires:
+            - test-setup-scm-git
+            - test-setup-scm-5.1
             - test-download-redmine
             - test-download-redmine-latest
             - test-download-redmine-latest-tiny-version
