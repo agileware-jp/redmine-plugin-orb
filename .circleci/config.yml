@@ -21,6 +21,54 @@ common_environment: &common_environment
     - lychee-ci-environment
 
 jobs: # Integration Testing jobs
+  test-setup-scm:
+    parameters:
+      redmine_version:
+        type: string
+      ruby_version:
+        type: string
+    executor:
+      name: redmine-plugin/ruby-sqlite3
+      ruby_version: << parameters.ruby_version >>
+    steps:
+      - redmine-plugin/download-redmine-git-url:
+          version: << parameters.redmine_version >>
+      - redmine-plugin/generate-database_yml
+      - redmine-plugin/bundle-install
+      - run:
+          name: Prepare test database
+          working_directory: redmine
+          command: RAILS_ENV=test bundle exec rake db:create db:migrate
+      - redmine-plugin/setup-scm
+      - run:
+          name: Verify test-only path configuration and repository validation
+          working_directory: redmine
+          command: |
+            RAILS_ENV=test bundle exec rails runner - \<<'RUBY'
+            require 'yaml'
+            configuration = YAML.load_file('config/configuration.yml')
+            raise 'Unexpected environments' unless configuration.keys == ['test']
+            %w[Git Subversion].each do |name|
+              prefix = name == 'Subversion' ? 'file://' : ''
+              repository = Repository.repository_class(name).new(url: "#{prefix}/tmp/orb-scm-test")
+              repository.valid?
+              raise "Invalid #{name} type" if repository.errors[:type].any?
+              raise "Invalid #{name} path" if repository.errors[:url].any?
+              repository.url = "#{prefix}/outside-orb-test-path/repository"
+              repository.valid?
+              raise "Unrestricted #{name} path" if repository.errors[:url].empty?
+            end
+            configuration['default'] = {'host_name' => 'existing.example'}
+            configuration['production'] = {'scm_git_path_regexp' => '/existing/.*'}
+            configuration['test']['scm_git_path_regexp'] = '/custom/.*'
+            File.write('config/configuration.yml', YAML.dump(configuration))
+            File.write('tmp/scm-configuration-before.yml', YAML.dump(configuration))
+            RUBY
+      - redmine-plugin/setup-scm
+      - run:
+          name: Verify existing configuration is preserved
+          working_directory: redmine
+          command: cmp config/configuration.yml tmp/scm-configuration-before.yml
   test-download-redmine:
     executor: orb-tools/ubuntu
     steps:
@@ -340,6 +388,14 @@ workflows:
   test-and-release:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
+      - test-setup-scm:
+          name: test-setup-scm-git
+          redmine_version: master
+          ruby_version: '4.0'
+      - test-setup-scm:
+          name: test-setup-scm-5.1
+          redmine_version: '5.1.13'
+          ruby_version: '3.1'
       - test-download-redmine:
           <<: *common_environment
       - test-download-redmine-latest
@@ -381,6 +437,8 @@ workflows:
           orb-name: agileware-jp/redmine-plugin
           publish-version-tag: false
           requires:
+            - test-setup-scm-git
+            - test-setup-scm-5.1
             - test-download-redmine
             - test-download-redmine-latest
             - test-download-redmine-latest-tiny-version

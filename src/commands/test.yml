@@ -13,6 +13,10 @@ parameters:
     description: Plugin name. If unspecified it will be the current repository's plugin.
     type: string
     default: ''
+  setup_scm:
+    description: Prepare Git and Subversion clients and test repository paths
+    type: boolean
+    default: true
 
 steps:
   - run:
@@ -30,6 +34,11 @@ steps:
       name: Setup Database
       working_directory: '<< parameters.redmine_root >>'
       command: RAILS_ENV=test bundle exec rake db:create db:migrate redmine:plugins
+  - when:
+      condition: << parameters.setup_scm >>
+      steps:
+        - setup-scm:
+            redmine_root: << parameters.redmine_root >>
   - run:
       name: Set tested plugin
       working_directory: '<< parameters.redmine_root >>'
