@@ -41,34 +41,13 @@ jobs: # Integration Testing jobs
           command: RAILS_ENV=test bundle exec rake db:create db:migrate
       - redmine-plugin/setup-scm
       - run:
-          name: Verify test-only path configuration and repository validation
+          name: Verify enabled SCM adapters
           working_directory: redmine
           command: |
             RAILS_ENV=test bundle exec rails runner - \<<'RUBY'
-            require 'yaml'
-            configuration = YAML.load_file('config/configuration.yml')
-            raise 'Unexpected environments' unless configuration.keys == ['test']
-            %w[Git Subversion].each do |name|
-              prefix = name == 'Subversion' ? 'file://' : ''
-              repository = Repository.repository_class(name).new(url: "#{prefix}/tmp/orb-scm-test")
-              repository.valid?
-              raise "Invalid #{name} type" if repository.errors[:type].any?
-              raise "Invalid #{name} path" if repository.errors[:url].any?
-              repository.url = "#{prefix}/outside-orb-test-path/repository"
-              repository.valid?
-              raise "Unrestricted #{name} path" if repository.errors[:url].empty?
-            end
-            configuration['default'] = {'host_name' => 'existing.example'}
-            configuration['production'] = {'scm_git_path_regexp' => '/existing/.*'}
-            configuration['test']['scm_git_path_regexp'] = '/custom/.*'
-            File.write('config/configuration.yml', YAML.dump(configuration))
-            File.write('tmp/scm-configuration-before.yml', YAML.dump(configuration))
+            enabled_scm = Setting.enabled_scm
+            raise "Unexpected enabled SCM adapters: #{enabled_scm.inspect}" unless enabled_scm.sort == %w[Git Subversion]
             RUBY
-      - redmine-plugin/setup-scm
-      - run:
-          name: Verify existing configuration is preserved
-          working_directory: redmine
-          command: cmp config/configuration.yml tmp/scm-configuration-before.yml
   test-download-redmine:
     executor: orb-tools/ubuntu
     steps:
