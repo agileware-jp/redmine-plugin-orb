@@ -38,7 +38,9 @@ jobs: # Integration Testing jobs
       - run:
           name: Prepare test database
           working_directory: redmine
-          command: RAILS_ENV=test bundle exec rake db:create db:migrate
+          command: |
+            RAILS_ENV=test bundle exec rake db:create db:migrate
+            RAILS_ENV=test bundle exec rails runner 'Setting.enabled_scm = []'
       - redmine-plugin/setup-scm
       - run:
           name: Verify enabled SCM adapters
