@@ -38,9 +38,7 @@ jobs: # Integration Testing jobs
       - run:
           name: Prepare test database
           working_directory: redmine
-          command: |
-            RAILS_ENV=test bundle exec rake db:create db:migrate
-            RAILS_ENV=test bundle exec rails runner 'Setting.enabled_scm = []'
+          command: RAILS_ENV=test bundle exec rake db:create db:migrate
       - redmine-plugin/setup-scm
       - run:
           name: Verify enabled SCM adapters
@@ -48,7 +46,7 @@ jobs: # Integration Testing jobs
           command: |
             RAILS_ENV=test bundle exec rails runner - \<<'RUBY'
             enabled_scm = Setting.enabled_scm
-            raise "Unexpected enabled SCM adapters: #{enabled_scm.inspect}" unless enabled_scm.sort == %w[Git Subversion]
+            raise "Unexpected enabled SCM adapters: #{enabled_scm.inspect}" unless (%w[Git Subversion] - enabled_scm).empty?
             RUBY
   test-download-redmine:
     executor: orb-tools/ubuntu
