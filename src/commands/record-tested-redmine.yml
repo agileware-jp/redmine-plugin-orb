@@ -1,0 +1,65 @@
+description: |
+  Record the Redmine actually used by a passed test job as a JSON file and
+  persist it to the workspace directory "tested-redmine/" so that downstream
+  jobs can collect it with attach_workspace without using the CircleCI API.
+
+  One file is written per job, named after CIRCLE_JOB. Characters outside
+  [A-Za-z0-9._-] are replaced with "-" and consecutive "-" are collapsed.
+  When parallelism is greater than 1, "-<CIRCLE_NODE_INDEX>" is appended.
+
+  Downstream jobs read "<attach_workspace at>/tested-redmine/*.json".
+  Zero files is a valid result (failed job, older orb, or recording disabled).
+
+parameters:
+  redmine_root:
+    description: Directory where Redmine is installed
+    type: string
+    default: redmine
+
+steps:
+  - run:
+      name: Record tested Redmine
+      working_directory: '<< parameters.redmine_root >>'
+      command: |
+        RAILS_ENV=test bundle exec rails runner - \<<'RUBY'
+        require 'fileutils'
+        require 'json'
+        require 'time'
+
+        workspace_root = '/tmp/tested-redmine-workspace'
+        directory = File.join(workspace_root, 'tested-redmine')
+        FileUtils.mkdir_p(directory)
+
+        job = ENV.fetch('CIRCLE_JOB')
+        basename = job.gsub(/[^A-Za-z0-9._-]/, '-').gsub(/-{2,}/, '-')
+        if ENV.fetch('CIRCLE_NODE_TOTAL', '1').to_i > 1
+          basename = "#{basename}-#{ENV.fetch('CIRCLE_NODE_INDEX')}"
+        end
+
+        redmine_commit = File.directory?('.git') ? `git rev-parse HEAD`.strip : nil
+        plugin =
+          if File.exist?('.tested_plugin')
+            File.read('.tested_plugin').strip
+          else
+            ENV.fetch('CIRCLE_PROJECT_REPONAME')
+          end
+
+        record = {
+          job: job,
+          redmine_version: Redmine::VERSION.to_s,
+          redmine_commit: redmine_commit,
+          ruby_version: RUBY_VERSION,
+          db_adapter: ActiveRecord::Base.connection.adapter_name,
+          plugin: plugin,
+          recorded_at: Time.now.utc.iso8601
+        }
+
+        path = File.join(directory, "#{basename}.json")
+        File.write(path, "#{JSON.pretty_generate(record)}\n")
+        puts "Recorded tested Redmine to #{path}"
+        puts File.read(path)
+        RUBY
+  - persist_to_workspace:
+      root: /tmp/tested-redmine-workspace
+      paths:
+        - tested-redmine
