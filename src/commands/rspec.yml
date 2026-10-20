@@ -31,6 +31,12 @@ parameters:
     description: Prepare Git and Subversion clients and test repository paths
     type: boolean
     default: true
+  record_tested_redmine:
+    description: |
+      Record the Redmine actually used by this job as tested-redmine/<job>.json
+      in the workspace after all tests pass (see the record-tested-redmine command)
+    type: boolean
+    default: true
 
 steps:
   - run:
@@ -117,3 +123,8 @@ steps:
             name: Test migration rollback
             working_directory: '<< parameters.redmine_root >>'
             command: RAILS_ENV=test bundle exec rake redmine:plugins:migrate NAME=`cat .tested_plugin` VERSION=0
+  - when:
+      condition: << parameters.record_tested_redmine >>
+      steps:
+        - record-tested-redmine:
+            redmine_root: << parameters.redmine_root >>

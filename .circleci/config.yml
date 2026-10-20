@@ -299,6 +299,34 @@ jobs: # Integration Testing jobs
       - run:
           name: Check if the coverage result file exists
           command: test -f /tmp/coverage/index.html
+      - run:
+          name: Check if the tested Redmine was recorded
+          command: |
+            file=/tmp/tested-redmine-workspace/tested-redmine/test-bundle-install-and-rspec.json
+            cat "$file"
+            ruby -rjson -rtime -e '
+              record = JSON.parse(File.read(ARGV[0]))
+              expected_version = ARGV[1]
+              raise "job: #{record["job"].inspect}" unless record["job"] == "test-bundle-install-and-rspec"
+              raise "redmine_version: #{record["redmine_version"].inspect}" unless record["redmine_version"].start_with?(expected_version)
+              raise "redmine_commit: #{record["redmine_commit"].inspect}" unless record["redmine_commit"].nil?
+              raise "ruby_version: #{record["ruby_version"].inspect}" unless record["ruby_version"] == RUBY_VERSION
+              raise "db_adapter: #{record["db_adapter"].inspect}" unless record["db_adapter"] == "SQLite"
+              raise "plugin: #{record["plugin"].inspect}" unless record["plugin"] == "redmine_issue_trash"
+              Time.iso8601(record.fetch("recorded_at"))
+            ' "$file" "$REDMINE_MIN_VERSION"
+  test-record-tested-redmine-workspace:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Check if the recorded file can be collected from the workspace
+          command: |
+            ls -l /tmp/workspace/tested-redmine
+            test "$(ls /tmp/workspace/tested-redmine | wc -l)" -eq 1
+            grep -q '"job": "test-bundle-install-and-rspec"' /tmp/workspace/tested-redmine/test-bundle-install-and-rspec.json
   test-bundle-install-and-test:
     executor:
       name: redmine-plugin/ruby-sqlite3
@@ -399,6 +427,9 @@ workflows:
           <<: *common_environment
       - test-bundle-install-and-rspec:
           <<: *common_environment
+      - test-record-tested-redmine-workspace:
+          requires:
+            - test-bundle-install-and-rspec
       - test-bundle-install-and-test:
           <<: *common_environment
       - test-build-plugin-assets
@@ -432,6 +463,7 @@ workflows:
             - test-generate-database_yml
             - test-bundle-install-without-Gemfile_local
             - test-bundle-install-and-rspec
+            - test-record-tested-redmine-workspace
             - test-bundle-install-and-test
             - test-build-plugin-assets
             - test-build-plugin-assets-with-docker
